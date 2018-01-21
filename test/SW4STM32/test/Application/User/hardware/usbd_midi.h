@@ -59,7 +59,7 @@ USBD_Midi_HandleTypeDef;
 uint8_t  USBD_Midi_RegisterInterface  (USBD_HandleTypeDef   *pdev,
                                       USBD_Midi_ItfTypeDef *fops);
 
-void writeMidi();
+void writeMidi(USBD_HandleTypeDef *pdev);
 
 #ifdef __cplusplus
 }

@@ -47,118 +47,126 @@ USBD_ClassTypeDef  USBD_Midi_ClassDriver =
 
 static uint8_t USBD_Midi_CfgDesc[USB_MIDI_CONFIG_DESC_SIZ] =
 {
-// configuration descriptor
-            0x09,
-            USB_DESC_TYPE_OTHER_SPEED_CONFIGURATION,
-            LOBYTE(USB_MIDI_CONFIG_DESC_SIZ),
-            HIBYTE(USB_MIDI_CONFIG_DESC_SIZ),
-            0x02,
-            0x01,
-            0x00,
-            0xc0,
-            0x50,
-
-            // The Audio Interface Collection
-            0x09,
-            0x04,
-            0x00,
-            0x00,
-            0x00,
-            0x01,
-            0x01,
-            0x00,
-            0x00, // Standard AC Interface Descriptor
-            0x09,
-            0x24,
-            0x01,
-            0x00,
-            0x01,
-            0x09,
-            0x00,
-            0x01,
-            0x01, // Class-specific AC Interface Descriptor
-            0x09,
-            0x04,
-            0x01,
-            0x00,
-            0x02,
-            0x01,
-            0x03,
-            0x00,
-            0x00, // MIDIStreaming Interface Descriptors
-            0x07,
-            0x24,
-            0x01,
-            0x00,
-            0x01,
-            0x41,
-            0x00,             // Class-Specific MS Interface Header Descriptor
-
+			// configuration descriptor
+            0x09, //bLength
+            USB_DESC_TYPE_OTHER_SPEED_CONFIGURATION, //bDescriptorType
+            LOBYTE(USB_MIDI_CONFIG_DESC_SIZ), //wTotalLength
+            HIBYTE(USB_MIDI_CONFIG_DESC_SIZ), //wTotalLength
+            0x02, //bNumInterfaces
+            0x01, //id of this configuration
+            0x00, //unused
+            0x80, //bus powered device
+            0x50, //max power 160mA
+            // Standard AC Interface Descriptor
+			//mandatory even if there is no audio support
+            0x09, //blength - size of this descriptor in bytes
+            0x04, //bDescriptorType - INTERFACE descriptor
+            0x00, //bInterfaceNumber - index if this interface
+            0x00, //bAlternateSetting - Index of this setting
+            0x00, //bNumEndpoints - number of audio endpoints
+            0x01, //bInterfaceClass - AUDIO
+            0x01, //bInterfaceSubclass - AUDIO_CONTROL
+            0x00, //unused
+            0x00, //unused
+			// Class-specific AC Interface Descriptor
+            0x09, //bLength
+            0x24, //bDescriptorType - CS_INTERFACE
+            0x01, //bDescriptorSubtype - HEADER subtype
+            0x00, //bcdAC - revision of class spec 1.0 ,low byte
+            0x01, //bcdAC - revision of class spec 1.0, high byte
+            0x09, //wTotalLength - Total size of class specific descriptors
+            0x00, //wTotalLength high byte
+            0x01, //binCollection - number of streaming interfaces
+            0x01, //baInterfaceNr - MIDIStreaming interface 1 belongs to this AudioContrl INterfac
+			// MIDIStreaming Interface Descriptors
+            0x09, //bLength
+            0x04, //bDescriptorType - INTERFACE descriptor
+            0x01, //bInterfaceNumber - index of this interface
+            0x00, //bAlternateSetting - Index of this alternate setting
+            0x02, //bNumEndpoints - number of endpoints
+            0x01, //bInterfaceClass - AUDIO
+            0x03, //bInterfaceSubclass - MIDISTREAMING
+            0x00, //unused
+            0x00, //unused
+			// Class-Specific MS Interface Header Descriptor
+            0x07, //bLength
+            0x24, //bDescriptorType - CS_INTERFACE
+            0x01, //bDescriptorSubtype - MS_HEADER subtype
+            0x00, //bcdADC - Revision of this class spec, low byte
+            0x01, //bcdADC - Revision of this class spec, high byte
+            0x41, //wTotalLength - Total size of class specific descriptors low byte
+            0x00, //wTotalLength - high byte
             // MIDI IN JACKS
-            0x06,
-            0x24,
-            0x02,
-            0x01,
-            0x01,
-            0x00,
-            0x06,
-            0x24,
-            0x02,
-            0x02,
-            0x02,
-            0x00,
+            0x06, //bLength
+            0x24, //bDescriptorType - CS_INTERFACE
+            0x02, //bDescriptorSubtype - MIDI_IN_JACK
+            0x01, //bJackType - EMBEDDED
+            0x01, //bJackId
+            0x00, //iJack - Unused
+
+            0x06, //bLength
+            0x24, //CS_INTERFACE
+            0x02, //MIDI_IN_JACK
+            0x02, //bjacKType - EXTERNAL
+            0x02, //bjackId
+            0x00, //iJack - unused
 
             // MIDI OUT JACKS
-            0x09,
-            0x24,
-            0x03,
-            0x01,
-            0x03,
-            0x01,
-            0x02,
-            0x01,
-            0x00,
-            0x09,
-            0x24,
-            0x03,
-            0x02,
-            0x06,
+            0x09, //bLength
+            0x24, //CS_INTERFACE
+            0x03, //MIDI_OUT_JACK
+            0x01, //EMBEDDED
+            0x03, //bJackId
+            0x01, //bNrInputPins - number of input pins of this jack
+            0x02, //BaSourceID
+            0x01, //BaSourcePin
+            0x00, //Unused
+
+            0x09, //bLength
+            0x24, //CS_INTERFACE
+            0x03, //MIDI_OUT_JACK
+            0x02, //EXTERNAL
+            0x06, //bJackId //FIXME why 0x6 instead 0f 0x4?
             0x01,
             0x01,
             0x01,
             0x00,
 
             // OUT endpoint descriptor
-            0x09,
-            0x05,
-            MIDI_OUT_EP,
-            0x02,
-            0x40,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x05,
-            0x25,
-            0x01,
-            0x01,
-            0x01,
+			//Standard bulk out endpoint descriptor
+            0x09, //bLength
+            0x05, //bdescriptorType - ENDPOINT descriptor
+            MIDI_OUT_EP, //bEndpointAdress
+            0x02, //bmAttributes - Bulk, not shared
+            0x40, //wMaxPacketSize 64 bytes, low byte
+            0x00, //wMaxPacketSize, high byte
+            0x00, //bInterval - unused for bulk
+            0x00, //bRefresh - unused
+            0x00, //bSynchAddress - unused
+			//class specific ms bulk out endpoint descriptor
+            0x05, //bLength
+            0x25, //CS_ENDPOINT
+            0x01, //MS_GENERAL subtype
+            0x01, //number of embedded midi in jacks
+            0x01, //id of the embedded midi in jack
 
             // IN endpoint descriptor
-            0x09,
-            0x05,
+			//standard bulk in endpoint descriptor
+            0x09, //bLength
+            0x05, //ENDPOINT
             MIDI_IN_EP,
-            0x02,
-            0x40,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x05,
-            0x25,
-            0x01,
-            0x01,
-            0x03,
+            0x02, //bulk, not shared
+            0x40, //wMaxPacketSize low byte
+            0x00, //wMaxPacketSize high byte
+            0x00, //ignred
+            0x00, //unused
+            0x00, //unused
+			//class specific ms bulk in endpoint descriptor
+            0x05, //bLength
+            0x25, //CS_ENDPOINT
+            0x01, //MS_GENERAL subtype
+            0x01, //number of embedded midi out jacks
+            0x03, //id of the embedded midi out jack
   };
 
 #if defined ( __ICCARM__ ) /*!< IAR Compiler */
@@ -167,14 +175,15 @@ static uint8_t USBD_Midi_CfgDesc[USB_MIDI_CONFIG_DESC_SIZ] =
 /* USB Standard Device Descriptor */
 static uint8_t USBD_Midi_DeviceQualifierDesc[USB_LEN_DEV_QUALIFIER_DESC] =
 {
-  USB_LEN_DEV_QUALIFIER_DESC,
-  USB_DESC_TYPE_DEVICE_QUALIFIER,
-  0x00,
-  0x02,
-  0x00,
-  0x00,
-  0x00,
-  0x40,
+  //FIXME why is this shorter?!
+  USB_LEN_DEV_QUALIFIER_DESC, //bLength
+  USB_DESC_TYPE_DEVICE_QUALIFIER, //bDescriptorType
+  0x00, //bcdUSB - usb version low byte
+  0x02, //bcdUSB - high byte
+  0x00, //bDeviceClass - Device defined at interface level
+  0x00, //unused
+  0x00, //unused
+  0x40, //bMaxPacketSize0
   0x01,
   0x00,
 };
@@ -239,21 +248,35 @@ void writeMidi(USBD_HandleTypeDef *pdev)
 	const uint8_t controlChannel = 12;
 	const uint8_t value = 42;
 
-	  //                             cable | 0xB
-	  const uint8_t usbFrame = (virtualCable << 4) | 0x0B;
+	//                             cable | 0xB
+	const uint8_t usbFrame = (virtualCable << 4) | 0x0B;
 
-	  //MIDI command for CC message: 4 bit | 4 bit
-	  //                             0xB   | midi channel
-	  const uint8_t midiCommand = 0xB0 | (channel > 0xF ? 0xF : channel);
+	//MIDI command for CC message: 4 bit | 4 bit
+	//                             0xB   | midi channel
+	const uint8_t midiCommand = 0xB0 | (channel > 0xF ? 0xF : channel);
 
-	  uint8_t buffer[4];
-	  //FIXME there might be a faster way to clamp the values
-	  buffer[0] = usbFrame;
-	  buffer[1] = midiCommand;
-	  buffer[2] = controlChannel > 119 ? 119 : controlChannel;
-	  buffer[3] = value > 127 ? 127 : value;
+	uint8_t buffer[4];
+	//FIXME there might be a faster way to clamp the values
+	buffer[0] = usbFrame;
+	buffer[1] = midiCommand;
+	buffer[2] = controlChannel > 119 ? 119 : controlChannel;
+	buffer[3] = value > 127 ? 127 : value;
 
-    USBD_LL_Transmit (pdev, MIDI_IN_EP,  buffer, 4);
+    switch(USBD_LL_Transmit (pdev, MIDI_IN_EP,  buffer, 4))
+    {
+    case USBD_OK:
+    	printf("ok");
+		break;
+    case USBD_FAIL:
+    	printf("fail\n");
+		break;
+    case USBD_BUSY:
+    	printf("busy\n");
+    	break;
+    default:
+		printf("default\n");
+
+    }
 }
 
 /**

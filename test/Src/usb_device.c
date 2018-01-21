@@ -62,15 +62,31 @@ USBD_HandleTypeDef hUsbDeviceFS;
 void MX_USB_DEVICE_Init(void)
 {
   /* USER CODE BEGIN USB_DEVICE_Init_PreTreatment */
-  
-  /* USER CODE END USB_DEVICE_Init_PreTreatment */
-  
-  /* Init Device Library,Add Supported Class and Start the library*/
+	//WARNING after regeneration make sure to remove the generated code!
+
+	//FIMXE remove after development is finished
+	//lower pa11 and pa12 (usb pins) and leave enough time for the host to notice. This will force a disconnect/reconnect on the host
+	//This is only relevant while developing because I dont have to unplug/replug usb all the time
+	GPIO_InitTypeDef GPIO_InitStruct;
+    GPIO_InitStruct.Pin = GPIO_PIN_11 | GPIO_PIN_12;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);
+
+
+    HAL_Delay(5);
 
 	USBD_Init(&hUsbDeviceFS, &FS_Desc, DEVICE_FS);
 	USBD_RegisterClass(&hUsbDeviceFS, &USBD_Midi_ClassDriver);
 	USBD_Midi_RegisterInterface(&hUsbDeviceFS, &USBD_Midi_fops);
 	USBD_Start(&hUsbDeviceFS);
+  /* USER CODE END USB_DEVICE_Init_PreTreatment */
+  
+  /* Init Device Library,Add Supported Class and Start the library*/
+
+
 
 //  USBD_RegisterClass(&hUsbDeviceFS, &USBD_MIDI);
 //

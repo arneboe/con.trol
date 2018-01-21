@@ -50,6 +50,8 @@
 #include "main.h"
 #include "stm32f1xx_hal.h"
 #include "usb_device.h"
+#include "midi/MidiMessages.h"
+#include "midi/Midi.h"
 
 /* USER CODE BEGIN Includes */
 
@@ -79,7 +81,6 @@ static void MX_ADC1_Init(void);
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
-
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
@@ -124,12 +125,22 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  CCMessage msgs[20];
+  for(int i = 0; i < 20; ++i)
+  {
+	  msgs[i].channel = 0;
+	  msgs[i].virtualCable = 0;
+	  msgs[i].controlChannel = 42;
+	  msgs[i].value = 30 + i;
+  }
   while (1)
   {
+//	  writeMidi(&hUsbDeviceFS);
+	  HAL_Delay(500);
+	  Midi_sendCC(msgs, 2);
   /* USER CODE END WHILE */
 
-	  writeMidi(&hUsbDeviceFS);
-	  HAL_Delay(500);
+
   /* USER CODE BEGIN 3 */
 
   }
@@ -294,7 +305,7 @@ static void MX_I2C1_Init(void)
 {
 
   hi2c1.Instance = I2C1;
-  hi2c1.Init.ClockSpeed = 100000;
+  hi2c1.Init.ClockSpeed = 400000;
   hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
   hi2c1.Init.OwnAddress1 = 0;
   hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
@@ -376,6 +387,15 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+//Retargets the C library printf function to the USART.
+int _write(int file, char* ptr, int len)
+{
+	if(HAL_UART_Transmit(&huart1, (uint8_t*)ptr, len, 0xFFFF) != HAL_OK)
+	{
+		return -1;
+	}
+	return len;
+}
 
 /* USER CODE END 4 */
 
@@ -386,6 +406,7 @@ static void MX_GPIO_Init(void)
   */
 void _Error_Handler(char * file, int line)
 {
+	printf("error! %s:%d", file, line);
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
   while(1) 
