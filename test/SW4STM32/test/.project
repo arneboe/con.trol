@@ -51,31 +51,6 @@
 			<locationURI>PARENT-2-PROJECT_LOC/Src/main.c</locationURI>
 		</link>
 		<link>
-			<name>Application/User/stm32f1xx_hal_msp.c</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/Src/stm32f1xx_hal_msp.c</locationURI>
-		</link>
-		<link>
-			<name>Application/User/stm32f1xx_it.c</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/Src/stm32f1xx_it.c</locationURI>
-		</link>
-		<link>
-			<name>Application/User/usb_device.c</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/Src/usb_device.c</locationURI>
-		</link>
-		<link>
-			<name>Application/User/usbd_conf.c</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/Src/usbd_conf.c</locationURI>
-		</link>
-		<link>
-			<name>Application/User/usbd_desc.c</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/Src/usbd_desc.c</locationURI>
-		</link>
-		<link>
 			<name>Drivers/CMSIS/system_stm32f1xx.c</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/Src/system_stm32f1xx.c</locationURI>
@@ -194,6 +169,31 @@
 			<name>Middlewares/USB_Device_Library/usbd_ioreq.c</name>
 			<type>1</type>
 			<location>/home/arne/STM32Cube/Repository/STM32Cube_FW_F1_V1.6.0/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ioreq.c</location>
+		</link>
+		<link>
+			<name>Application/User/hardware/stm32f1xx_hal_msp.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/Src/stm32f1xx_hal_msp.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/hardware/stm32f1xx_it.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/Src/stm32f1xx_it.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/hardware/usb_device.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/Src/usb_device.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/hardware/usbd_conf.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/Src/usbd_conf.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/hardware/usbd_desc.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/Src/usbd_desc.c</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
