@@ -66,11 +66,6 @@
 			<locationURI>PARENT-2-PROJECT_LOC/Src/usb_device.c</locationURI>
 		</link>
 		<link>
-			<name>Application/User/usbd_audio_if.c</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/Src/usbd_audio_if.c</locationURI>
-		</link>
-		<link>
 			<name>Application/User/usbd_conf.c</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/Src/usbd_conf.c</locationURI>
