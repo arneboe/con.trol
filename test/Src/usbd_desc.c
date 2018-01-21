@@ -73,12 +73,12 @@
   */ 
 #define USBD_VID     1155
 #define USBD_LANGID_STRING     1033
-#define USBD_MANUFACTURER_STRING     "STMicroelectronics"
+#define USBD_MANUFACTURER_STRING     "Arne Boeckmann"
 #define USBD_PID_FS     22336
-#define USBD_PRODUCT_STRING_FS     "STM32 Audio Class"
+#define USBD_PRODUCT_STRING_FS     "STM32 USB MIDI"
 #define USBD_SERIALNUMBER_STRING_FS     "00000000001A"
-#define USBD_CONFIGURATION_STRING_FS     "AUDIO Config"
-#define USBD_INTERFACE_STRING_FS     "AUDIO Interface"
+#define USBD_CONFIGURATION_STRING_FS     "Midi Config"
+#define USBD_INTERFACE_STRING_FS     "Midi Interface"
 
 /* USER CODE BEGIN 0 */
 
@@ -139,7 +139,7 @@ __ALIGN_BEGIN uint8_t USBD_FS_DeviceDesc[USB_LEN_DEV_DESC] __ALIGN_END =
     LOBYTE(USBD_PID_FS),           /*idVendor*/
     HIBYTE(USBD_PID_FS),           /*idVendor*/
     0x00,                       /*bcdDevice rel. 2.00*/
-    0x02,
+    0x01,
     USBD_IDX_MFC_STR,           /*Index of manufacturer  string*/
     USBD_IDX_PRODUCT_STR,       /*Index of product string*/
     USBD_IDX_SERIAL_STR,        /*Index of serial number string*/
