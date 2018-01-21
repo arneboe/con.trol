@@ -1,7 +1,5 @@
-Application/User/usbd_audio_if.o: \
- /home/arne/git/stm32-cubemx-usb-midi/test/Src/usbd_audio_if.c \
- /home/arne/git/stm32-cubemx-usb-midi/test/Inc/usbd_audio_if.h \
- /home/arne/STM32Cube/Repository/STM32Cube_FW_F1_V1.6.0/Middlewares/ST/STM32_USB_Device_Library/Class/AUDIO/Inc/usbd_audio.h \
+Application/User/usbd_midi.o: ../Application/User/usbd_midi.c \
+ ../Application/User/usbd_midi.h \
  /home/arne/STM32Cube/Repository/STM32Cube_FW_F1_V1.6.0/Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ioreq.h \
  /home/arne/STM32Cube/Repository/STM32Cube_FW_F1_V1.6.0/Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_def.h \
  /home/arne/git/stm32-cubemx-usb-midi/test/Inc/usbd_conf.h \
@@ -36,11 +34,11 @@ Application/User/usbd_audio_if.o: \
  /home/arne/STM32Cube/Repository/STM32Cube_FW_F1_V1.6.0/Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_def.h \
  /home/arne/STM32Cube/Repository/STM32Cube_FW_F1_V1.6.0/Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_core.h \
  /home/arne/STM32Cube/Repository/STM32Cube_FW_F1_V1.6.0/Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ioreq.h \
+ /home/arne/STM32Cube/Repository/STM32Cube_FW_F1_V1.6.0/Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ctlreq.h \
+ /home/arne/git/stm32-cubemx-usb-midi/test/Inc/usbd_desc.h \
  /home/arne/STM32Cube/Repository/STM32Cube_FW_F1_V1.6.0/Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ctlreq.h
 
-/home/arne/git/stm32-cubemx-usb-midi/test/Inc/usbd_audio_if.h:
-
-/home/arne/STM32Cube/Repository/STM32Cube_FW_F1_V1.6.0/Middlewares/ST/STM32_USB_Device_Library/Class/AUDIO/Inc/usbd_audio.h:
+../Application/User/usbd_midi.h:
 
 /home/arne/STM32Cube/Repository/STM32Cube_FW_F1_V1.6.0/Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ioreq.h:
 
@@ -109,5 +107,9 @@ Application/User/usbd_audio_if.o: \
 /home/arne/STM32Cube/Repository/STM32Cube_FW_F1_V1.6.0/Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_core.h:
 
 /home/arne/STM32Cube/Repository/STM32Cube_FW_F1_V1.6.0/Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ioreq.h:
+
+/home/arne/STM32Cube/Repository/STM32Cube_FW_F1_V1.6.0/Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ctlreq.h:
+
+/home/arne/git/stm32-cubemx-usb-midi/test/Inc/usbd_desc.h:
 
 /home/arne/STM32Cube/Repository/STM32Cube_FW_F1_V1.6.0/Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ctlreq.h:
