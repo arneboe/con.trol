@@ -255,14 +255,25 @@ void writeMidi(USBD_HandleTypeDef *pdev)
 	//                             0xB   | midi channel
 	const uint8_t midiCommand = 0xB0 | (channel > 0xF ? 0xF : channel);
 
-	uint8_t buffer[4];
-	//FIXME there might be a faster way to clamp the values
+	uint8_t buffer[12];
+
+	//just random shit so i can see something on the midi receiver
 	buffer[0] = usbFrame;
 	buffer[1] = midiCommand;
 	buffer[2] = controlChannel > 119 ? 119 : controlChannel;
 	buffer[3] = value > 127 ? 127 : value;
 
-    switch(USBD_LL_Transmit (pdev, MIDI_IN_EP,  buffer, 4))
+	buffer[4] = usbFrame;
+	buffer[5] = midiCommand;
+	buffer[6] = controlChannel > 119 ? 119 : controlChannel;
+	buffer[7] = value > 127 ? 127 : value;
+
+	buffer[8] = usbFrame;
+	buffer[9] = midiCommand;
+	buffer[10] = controlChannel > 119 ? 119 : controlChannel;
+	buffer[11] = value > 127 ? 127 : value;
+
+    switch(USBD_LL_Transmit (pdev, MIDI_IN_EP,  buffer, 8))
     {
     case USBD_OK:
     	printf("ok");
