@@ -64,9 +64,7 @@ void MX_USB_DEVICE_Init(void)
   /* USER CODE BEGIN USB_DEVICE_Init_PreTreatment */
 	//WARNING after regeneration make sure to remove the generated code!
 
-	//FIMXE remove after development is finished
 	//lower pa11 and pa12 (usb pins) and leave enough time for the host to notice. This will force a disconnect/reconnect on the host
-	//This is only relevant while developing because I dont have to unplug/replug usb all the time
 	GPIO_InitTypeDef GPIO_InitStruct;
     GPIO_InitStruct.Pin = GPIO_PIN_11 | GPIO_PIN_12;
     GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
