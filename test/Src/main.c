@@ -126,21 +126,21 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 
-//  CCMessage msgs[20];
-//  for(int i = 0; i < 20; ++i)
-//  {
-//	  msgs[i].channel = 0;
-//	  msgs[i].virtualCable = 0;
-//	  msgs[i].controlChannel = 42;
-//	  msgs[i].value = 30 + i;
- // }
+  CCMessage msgs[20];
+  for(int i = 0; i < 20; ++i)
+  {
+	  msgs[i].channel = 0;
+	  msgs[i].virtualCable = 0;
+	  msgs[i].controlChannel = i;
+	  msgs[i].value = 30 + i;
+  }
 
   while (1)
   {
 	  printf("loop\n");
-	  writeMidi(&hUsbDeviceFS);
+	 // writeMidi(&hUsbDeviceFS);
 	  HAL_Delay(500);
-//	  Midi_sendCC(msgs, 3);
+	  Midi_sendCC(msgs, 10);
   /* USER CODE END WHILE */
 
 
