@@ -3,6 +3,8 @@
 #include <stdint.h>
 
 
+extern "C" {
+
 typedef struct
 {
 	uint8_t virtualCable; // range [0x0 .. 0xF]
@@ -14,3 +16,4 @@ typedef struct
 
 
 bool CCMessage_toBuffer(const CCMessage* msg, uint8_t* buffer, uint8_t bufferSize);
+}
