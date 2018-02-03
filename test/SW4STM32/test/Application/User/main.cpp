@@ -1,15 +1,11 @@
-/* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32f1xx_hal.h"
 #include "usb_device.h"
 #include "midi/MidiMessages.h"
 #include "midi/Midi.h"
+#include "fader/Fader.h"
+#include "hardware/ErrorHandler.h"
 
-/* USER CODE BEGIN Includes */
-
-/* USER CODE END Includes */
-
-/* Private variables ---------------------------------------------------------*/
 ADC_HandleTypeDef hadc1;
 DMA_HandleTypeDef hdma_adc1;
 
@@ -18,12 +14,6 @@ DMA_HandleTypeDef hdma_i2c1_tx;
 
 UART_HandleTypeDef huart1;
 
-/* USER CODE BEGIN PV */
-/* Private variables ---------------------------------------------------------*/
-
-/* USER CODE END PV */
-
-/* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_DMA_Init(void);
@@ -31,52 +21,30 @@ static void MX_USART1_UART_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_ADC1_Init(void);
 
-/* USER CODE BEGIN PFP */
-/* Private function prototypes -----------------------------------------------*/
-/* USER CODE END PFP */
-
-/* USER CODE BEGIN 0 */
-
-/* USER CODE END 0 */
-
 int main(void)
 {
-
-  /* USER CODE BEGIN 1 */
-
-  /* USER CODE END 1 */
-
-  /* MCU Configuration----------------------------------------------------------*/
-
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
-
-  /* USER CODE BEGIN Init */
-
-  /* USER CODE END Init */
-
   /* Configure the system clock */
   SystemClock_Config();
-
-  /* USER CODE BEGIN SysInit */
-
-  /* USER CODE END SysInit */
-
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_USART1_UART_Init();
+
+
+  char* bla = "bla\n";
+
+  HAL_UART_Transmit(&huart1, (uint8_t*)bla, 4, 0xFFFF);
+
   MX_I2C1_Init();
   MX_ADC1_Init();
   MX_USB_DEVICE_Init();
 
-  /* USER CODE BEGIN 2 */
+  printf("STM32 USB MIDI START\n");
 
-  /* USER CODE END 2 */
+  Faders::start();
 
-
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
 
   CCMessage msgs[20];
   for(int i = 0; i < 20; ++i)
@@ -89,18 +57,9 @@ int main(void)
 
   while (1)
   {
-	  printf("loop\n");
-	 // writeMidi(&hUsbDeviceFS);
-	  HAL_Delay(500);
-	  Midi_sendCC(msgs, 10);
-  /* USER CODE END WHILE */
-
-
-  /* USER CODE BEGIN 3 */
+		  HAL_Delay(500);
 
   }
-  /* USER CODE END 3 */
-
 }
 
 /** System Clock Configuration
@@ -123,7 +82,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
-    _Error_Handler(__FILE__, __LINE__);
+    Error_Handler();
   }
 
     /**Initializes the CPU, AHB and APB busses clocks
@@ -137,7 +96,7 @@ void SystemClock_Config(void)
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
   {
-    _Error_Handler(__FILE__, __LINE__);
+    Error_Handler();
   }
 
   PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_ADC|RCC_PERIPHCLK_USB;
@@ -145,7 +104,7 @@ void SystemClock_Config(void)
   PeriphClkInit.UsbClockSelection = RCC_USBCLKSOURCE_PLL_DIV1_5;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
-    _Error_Handler(__FILE__, __LINE__);
+    Error_Handler();
   }
 
     /**Configure the Systick interrupt time
@@ -177,7 +136,7 @@ static void MX_ADC1_Init(void)
   hadc1.Init.NbrOfConversion = 8;
   if (HAL_ADC_Init(&hadc1) != HAL_OK)
   {
-    _Error_Handler(__FILE__, __LINE__);
+    Error_Handler();
   }
 
     /**Configure Regular Channel
@@ -187,7 +146,7 @@ static void MX_ADC1_Init(void)
   sConfig.SamplingTime = ADC_SAMPLETIME_239CYCLES_5;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
-    _Error_Handler(__FILE__, __LINE__);
+    Error_Handler();
   }
 
     /**Configure Regular Channel
@@ -196,7 +155,7 @@ static void MX_ADC1_Init(void)
   sConfig.Rank = 2;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
-    _Error_Handler(__FILE__, __LINE__);
+    Error_Handler();
   }
 
     /**Configure Regular Channel
@@ -205,7 +164,7 @@ static void MX_ADC1_Init(void)
   sConfig.Rank = 3;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
-    _Error_Handler(__FILE__, __LINE__);
+    Error_Handler();
   }
 
     /**Configure Regular Channel
@@ -214,7 +173,7 @@ static void MX_ADC1_Init(void)
   sConfig.Rank = 4;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
-    _Error_Handler(__FILE__, __LINE__);
+    Error_Handler();
   }
 
     /**Configure Regular Channel
@@ -223,7 +182,7 @@ static void MX_ADC1_Init(void)
   sConfig.Rank = 5;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
-    _Error_Handler(__FILE__, __LINE__);
+    Error_Handler();
   }
 
     /**Configure Regular Channel
@@ -232,7 +191,7 @@ static void MX_ADC1_Init(void)
   sConfig.Rank = 6;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
-    _Error_Handler(__FILE__, __LINE__);
+    Error_Handler();
   }
 
     /**Configure Regular Channel
@@ -241,7 +200,7 @@ static void MX_ADC1_Init(void)
   sConfig.Rank = 7;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
-    _Error_Handler(__FILE__, __LINE__);
+    Error_Handler();
   }
 
     /**Configure Regular Channel
@@ -250,7 +209,7 @@ static void MX_ADC1_Init(void)
   sConfig.Rank = 8;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
-    _Error_Handler(__FILE__, __LINE__);
+    Error_Handler();
   }
 
 }
@@ -270,7 +229,7 @@ static void MX_I2C1_Init(void)
   hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
   if (HAL_I2C_Init(&hi2c1) != HAL_OK)
   {
-    _Error_Handler(__FILE__, __LINE__);
+    Error_Handler();
   }
 
 }
@@ -289,7 +248,7 @@ static void MX_USART1_UART_Init(void)
   huart1.Init.OverSampling = UART_OVERSAMPLING_16;
   if (HAL_UART_Init(&huart1) != HAL_OK)
   {
-    _Error_Handler(__FILE__, __LINE__);
+    Error_Handler();
   }
 
 }
@@ -341,7 +300,9 @@ static void MX_GPIO_Init(void)
 
 }
 
-/* USER CODE BEGIN 4 */
+
+extern "C"
+{
 //Retargets the C library printf function to the USART.
 int _write(int file, char* ptr, int len)
 {
@@ -351,24 +312,9 @@ int _write(int file, char* ptr, int len)
 	}
 	return len;
 }
-
-/* USER CODE END 4 */
-
-/**
-  * @brief  This function is executed in case of error occurrence.
-  * @param  None
-  * @retval None
-  */
-void _Error_Handler(char * file, int line)
-{
-	printf("error! %s:%d", file, line);
-  /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
-  while(1)
-  {
-  }
-  /* USER CODE END Error_Handler_Debug */
 }
+
+
 
 #ifdef USE_FULL_ASSERT
 
@@ -389,13 +335,3 @@ void assert_failed(uint8_t* file, uint32_t line)
 }
 
 #endif
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-*/
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

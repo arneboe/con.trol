@@ -1,0 +1,8 @@
+eclipse.preferences.version=1
+environment/project/fr.ac6.managedbuild.config.gnu.cross.exe.debug.1896022862/LD_LIBRARY_PATH/delimiter=\:
+environment/project/fr.ac6.managedbuild.config.gnu.cross.exe.debug.1896022862/LD_LIBRARY_PATH/operation=append
+environment/project/fr.ac6.managedbuild.config.gnu.cross.exe.debug.1896022862/LD_LIBRARY_PATH/value=/lib/x86_64-linux-gnu/
+environment/project/fr.ac6.managedbuild.config.gnu.cross.exe.debug.1896022862/append=true
+environment/project/fr.ac6.managedbuild.config.gnu.cross.exe.debug.1896022862/appendContributed=true
+environment/project/fr.ac6.managedbuild.config.gnu.cross.exe.release.369365170/append=true
+environment/project/fr.ac6.managedbuild.config.gnu.cross.exe.release.369365170/appendContributed=true
