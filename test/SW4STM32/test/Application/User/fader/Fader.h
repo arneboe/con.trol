@@ -1,16 +1,16 @@
 #pragma once
 #include "stm32f1xx_hal.h"
+#include "RingBufferWithSum.h"
 
 #define NUM_FADERS 8
 
 struct Fader
 {
 	uint16_t rawAdcValue = 0;
-	float averageAdcValue = 1;
+	float averageAdcValue = 0;
 	uint8_t midiValue = 0;
 	bool isLinear = false;
 	void update(uint16_t adcValue);
-
 };
 
 

@@ -31,20 +31,17 @@ int main(void)
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_USART1_UART_Init();
-
-
-  char* bla = "bla\n";
-
-  HAL_UART_Transmit(&huart1, (uint8_t*)bla, 4, 0xFFFF);
-
   MX_I2C1_Init();
   MX_ADC1_Init();
   MX_USB_DEVICE_Init();
 
-  printf("STM32 USB MIDI START\n");
-
   Faders::start();
 
+  printf("STM32 USB MIDI INIT DONE\n");
+
+
+  //the main just updates the displays.
+  //everything else is done in interrupts
 
   CCMessage msgs[20];
   for(int i = 0; i < 20; ++i)
