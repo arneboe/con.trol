@@ -405,11 +405,9 @@ bool Adafruit_SSD1306::displayInternal(const uint32_t bufferSize)
     return true;
 }
 
-void Adafruit_SSD1306::waitForReady()
+bool Adafruit_SSD1306::waitForReady()
 {
-	while(HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY)
-	{
-	}
+  return waitForI2cReady(50);
 }
 
 bool Adafruit_SSD1306::display(void)

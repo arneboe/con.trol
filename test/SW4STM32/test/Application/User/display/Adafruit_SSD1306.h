@@ -131,7 +131,7 @@ class Adafruit_SSD1306 : public Adafruit_GFX {
   void invertDisplay(uint8_t i);
 
   /**Blocks until the device is ready, i.e. all transfers are finished */
-  void waitForReady();
+  bool waitForReady();
 
   bool displayRead();
 

@@ -32,22 +32,17 @@ int main(void)
 
   initHardware();
 
-  tcaselect(0);
-
   Adafruit_SSD1306 display(hi2c1);
-  display.begin(SSD1306_SWITCHCAPVCC, 0x78);
-  display.fillScreen(BLACK);
-  display.fillHeader(WHITE);
-  display.display();
+  for(int i = 0; i < 8; ++i)
+  {
+    tcaselect(i);
+    display.begin(SSD1306_SWITCHCAPVCC, 0x78);
+    display.fillScreen(BLACK);
+    display.fillHeader(WHITE);
+    display.display();
+    display.waitForReady();
+  }
 
-  display.waitForReady();
-
-  tcaselect(1);
-  display.waitForReady();
-  display.begin(SSD1306_SWITCHCAPVCC, 0x78);
-  display.display();
-
-  display.waitForReady();
 
 
   //the main just updates the displays.
