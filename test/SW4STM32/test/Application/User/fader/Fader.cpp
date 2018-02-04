@@ -1,6 +1,6 @@
 #include <fader/Fader.h>
-#include <hardware/Handles.h>
 #include <hardware/ErrorHandler.h>
+#include <hardware/Hardware.h>
 #include <cmath>
 
 Fader Faders::faders[NUM_FADERS];

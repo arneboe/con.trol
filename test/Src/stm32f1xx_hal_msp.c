@@ -48,10 +48,8 @@
   */
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx_hal.h"
-
-extern DMA_HandleTypeDef hdma_adc1;
-
-extern DMA_HandleTypeDef hdma_i2c1_tx;
+#include <hardware/Hardware.h>
+#include <hardware/ErrorHandler.h>
 
 extern void _Error_Handler(char *, int);
 /* USER CODE BEGIN 0 */
@@ -139,7 +137,7 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
     hdma_adc1.Init.Priority = DMA_PRIORITY_LOW;
     if (HAL_DMA_Init(&hdma_adc1) != HAL_OK)
     {
-      _Error_Handler(__FILE__, __LINE__);
+      Error_Handler();
     }
 
     __HAL_LINKDMA(hadc,DMA_Handle,hdma_adc1);
@@ -229,7 +227,7 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* hi2c)
     hdma_i2c1_tx.Init.Priority = DMA_PRIORITY_LOW;
     if (HAL_DMA_Init(&hdma_i2c1_tx) != HAL_OK)
     {
-      _Error_Handler(__FILE__, __LINE__);
+      Error_Handler();
     }
 
     __HAL_LINKDMA(hi2c,hdmatx,hdma_i2c1_tx);
