@@ -196,6 +196,10 @@ void Adafruit_GFX::fillScreen(uint16_t color) {
     fillRect(0, 0, _width, _height, color);
 }
 
+void Adafruit_GFX::fillHeader(uint16_t color) {
+    fillRect(0, 0, _width, HEADER_HEIGHT, color);
+}
+
 void Adafruit_GFX::drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1,
         uint16_t color) {
     // Update in subclasses if desired!

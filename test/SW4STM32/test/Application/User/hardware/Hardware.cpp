@@ -19,6 +19,20 @@ static void MX_I2C1_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_TIM2_Init(void);
 
+
+bool waitForI2cReady(uint16_t timeoutMS)
+{
+  volatile uint32_t startTime = HAL_GetTick();
+  while(HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY)
+  {
+    if(HAL_GetTick() - startTime > timeoutMS)
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
 void initHardware()
 {
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */

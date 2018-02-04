@@ -19,7 +19,11 @@ void tcaselect(uint8_t i) {
   }
   else
   {
-    printf("Set multiplexer target to %d\n", i);
+    //printf("Set multiplexer target to %d\n", i);
+    if(!waitForI2cReady(10))
+    {
+      printf("I2C timeout in tcaselect(%d)\n", i);
+    }
   }
 }
 
@@ -33,29 +37,56 @@ int main(void)
   Adafruit_SSD1306 display(hi2c1);
   display.begin(SSD1306_SWITCHCAPVCC, 0x78);
   display.fillScreen(BLACK);
-  display.setTextColor(WHITE);
-  display.setTextSize(2);
-  display.println("bla");
+  display.fillHeader(WHITE);
   display.display();
 
   display.waitForReady();
 
   tcaselect(1);
+  display.waitForReady();
   display.begin(SSD1306_SWITCHCAPVCC, 0x78);
-  display.fillScreen(BLACK);
   display.display();
 
+  display.waitForReady();
 
 
   //the main just updates the displays.
   //everything else is done in interrupts
-
+  uint8_t lastMidiValues[NUM_FADERS] = {255};
   while (1)
-  {  }
+  {
+
+    for(int i = 0; i < NUM_FADERS; ++i)
+    {
+      const uint8_t currentValue = Faders::faders[i].midiValue;
+      if(currentValue != lastMidiValues[i])
+      {
+        lastMidiValues[i] = currentValue;
+        tcaselect(i);
+        display.fillHeader(BLACK);
+        display.setTextColor(WHITE);
+        display.setTextSize(2);
+        display.setCursor(0, 0);
+        display.println(currentValue);
+        if(!display.display())
+        {
+          printf("ERROR: Display %d did not respond\n", i);
+        }
+        if(!waitForI2cReady(50))
+        {
+          printf("ERROR: Display %d failed\n", i);
+        }
+      }
+    }
+  }
 }
+
+
+
 
 extern "C"
 {
+  //handle midi messages at 1000hz
   void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   {
     //update midi

@@ -215,50 +215,45 @@ void Adafruit_SSD1306::invertDisplay(uint8_t i) {
   }
 }
 
-void Adafruit_SSD1306::ssd1306_command(uint8_t c) {
+bool Adafruit_SSD1306::ssd1306_command(uint8_t c) {
 	// I2C
 	const uint8_t control = 0x00;   // Co = 0, D/C = 0
 	uint8_t data[] = {control, c};
 	if(HAL_I2C_Master_Transmit(&i2c, (uint16_t)_i2caddr, data, 2, 10000)!= HAL_OK)
-	  {
-		/* Error_Handler() function is called when Timeout error occurs.
-		   When Acknowledge failure occurs (Slave don't acknowledge its address)
-		   Master restarts communication */
-		switch(HAL_I2C_GetError(&i2c))
-		{
-		case HAL_I2C_ERROR_NONE:  //can never happen?
-//			Error_Handler_msg(HAL_I2C_ERROR_NONE);
-			break;
-		case HAL_I2C_ERROR_BERR:
-		  Error_Handler();
-			break;
-		case HAL_I2C_ERROR_ARLO:
-		  Error_Handler();
-			break;
-		case HAL_I2C_ERROR_AF:
-		  Error_Handler();
-		  break;
-		case HAL_I2C_ERROR_OVR:
-		  Error_Handler();
-			break;
-		case HAL_I2C_ERROR_DMA:
-		  Error_Handler();
-			break;
-		case HAL_I2C_ERROR_TIMEOUT:
-		  Error_Handler();
-			break;
-		default:
-//			Error_Handler_msg(default);
-			break;
-		}
-	  }
-
-
-//	Wire.beginTransmission(_i2caddr);
-//	Wire.write(control);
-//	Wire.write(c);
-//	Wire.endTransmission();
-
+  {
+    /* Error_Handler() function is called when Timeout error occurs.
+     When Acknowledge failure occurs (Slave don't acknowledge its address)
+     Master restarts communication */
+    switch (HAL_I2C_GetError(&i2c))
+    {
+      case HAL_I2C_ERROR_NONE:  //can never happen?
+        return true;
+      case HAL_I2C_ERROR_BERR:
+        Error_Handler();
+        break;
+      case HAL_I2C_ERROR_ARLO:
+        Error_Handler();
+        break;
+      case HAL_I2C_ERROR_AF:
+        //Error_Handler();
+        //slave does not exist
+        return false;
+        break;
+      case HAL_I2C_ERROR_OVR:
+        Error_Handler();
+        break;
+      case HAL_I2C_ERROR_DMA:
+        Error_Handler();
+        break;
+      case HAL_I2C_ERROR_TIMEOUT:
+        Error_Handler();
+        break;
+      default:
+        Error_Handler();
+        break;
+    }
+  }
+	return true;
 }
 
 // startscrollright
@@ -357,20 +352,22 @@ bool Adafruit_SSD1306::displayInternal(const uint32_t bufferSize)
 		  return false;
 	  }
 
-	  ssd1306_command(SSD1306_COLUMNADDR);
-	  ssd1306_command(0);   // Column start address (0 = reset)
-	  ssd1306_command(SSD1306_LCDWIDTH-1); // Column end address (127 = reset)
+	  if(!ssd1306_command(SSD1306_COLUMNADDR))
+	    return false;
 
-	  ssd1306_command(SSD1306_PAGEADDR);
-	  ssd1306_command(0); // Page start address (0 = reset)
+
+	  if(!ssd1306_command(0)) return false;   // Column start address (0 = reset)
+	  if(!ssd1306_command(SSD1306_LCDWIDTH-1)) return false; // Column end address (127 = reset)
+	  if(!ssd1306_command(SSD1306_PAGEADDR)) return false;
+	  if(!ssd1306_command(0)) return false; // Page start address (0 = reset)
 	  #if SSD1306_LCDHEIGHT == 64
-	    ssd1306_command(7); // Page end address
+	  if(!ssd1306_command(7)) return false; // Page end address
 	  #endif
 	  #if SSD1306_LCDHEIGHT == 32
-	    ssd1306_command(3); // Page end address
+	  if(!ssd1306_command(3)) return false; // Page end address
 	  #endif
 	  #if SSD1306_LCDHEIGHT == 16
-	    ssd1306_command(1); // Page end address
+	  if(!ssd1306_command(1)) return false; // Page end address
 	  #endif
 
 
@@ -379,33 +376,33 @@ bool Adafruit_SSD1306::displayInternal(const uint32_t bufferSize)
 	    if(HAL_I2C_Master_Transmit_DMA(&i2c, (uint16_t)_i2caddr, dataBuffer, bufferSize) != HAL_OK)
 	//    if(HAL_I2C_Master_Transmit(&i2c, (uint16_t)_i2caddr, dataBuffer, SSD1306_LCDHEIGHT * SSD1306_LCDWIDTH / 8 + 1, 10000) != HAL_OK)
 	    {
-			switch(HAL_I2C_GetError(&i2c))
-			{
-			case HAL_I2C_ERROR_NONE://can never happen
-				break;
-			case HAL_I2C_ERROR_BERR:
-			  Error_Handler();
-				break;
-			case HAL_I2C_ERROR_ARLO:
-			  Error_Handler();
-				break;
-			case HAL_I2C_ERROR_AF:
-			  Error_Handler();
-				break;
-			case HAL_I2C_ERROR_OVR:
-			  Error_Handler();
-				break;
-			case HAL_I2C_ERROR_DMA:
-			  Error_Handler();
-				break;
-			case HAL_I2C_ERROR_TIMEOUT:
-			  Error_Handler();
-				break;
-			default:
-			  Error_Handler();
-				break;
-			}
+        switch(HAL_I2C_GetError(&i2c))
+        {
+        case HAL_I2C_ERROR_NONE://can never happen
+          return true;
+        case HAL_I2C_ERROR_BERR:
+          Error_Handler();
+          break;
+        case HAL_I2C_ERROR_ARLO:
+          Error_Handler();
+          break;
+        case HAL_I2C_ERROR_AF:
+          return false; //device did not respond should not crash the system
+        case HAL_I2C_ERROR_OVR:
+          Error_Handler();
+          break;
+        case HAL_I2C_ERROR_DMA:
+          Error_Handler();
+          break;
+        case HAL_I2C_ERROR_TIMEOUT:
+          Error_Handler();
+          break;
+        default:
+          Error_Handler();
+          break;
+        }
 	    }
+    return true;
 }
 
 void Adafruit_SSD1306::waitForReady()

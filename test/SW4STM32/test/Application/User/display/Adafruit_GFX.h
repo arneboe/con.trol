@@ -40,6 +40,7 @@ class Adafruit_GFX : public Print
     drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color),
     fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color),
     fillScreen(uint16_t color),
+    fillHeader(uint16_t color),
     // Optional and probably not necessary to change
     drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color),
     drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
@@ -118,6 +119,7 @@ class Adafruit_GFX : public Print
       int16_t *minx, int16_t *miny, int16_t *maxx, int16_t *maxy);
   const int16_t
     WIDTH, HEIGHT;   // This is the 'raw' display w/h - never changes
+  const int16_t HEADER_HEIGHT = 16;
   int16_t
     _width, _height, // Display w/h as modified by current rotation
     cursor_x, cursor_y;

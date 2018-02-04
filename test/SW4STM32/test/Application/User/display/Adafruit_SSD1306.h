@@ -123,7 +123,9 @@ class Adafruit_SSD1306 : public Adafruit_GFX {
   Adafruit_SSD1306(I2C_HandleTypeDef& i2c);
 
   void begin(uint8_t switchvcc = SSD1306_SWITCHCAPVCC, uint8_t i2caddr = SSD1306_I2C_ADDRESS);
-  void ssd1306_command(uint8_t c);
+
+  /**Returns true if command was sent, false if device did not respond */
+  bool ssd1306_command(uint8_t c);
 
   void clearDisplay(void);
   void invertDisplay(uint8_t i);

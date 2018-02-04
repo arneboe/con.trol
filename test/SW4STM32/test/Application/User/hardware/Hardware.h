@@ -12,4 +12,7 @@ extern TIM_HandleTypeDef htim2;
 void initHardware();
 
 
+/** Returns false if timeout, true if device is ready */
+bool waitForI2cReady(uint16_t timeoutMS);
+
 

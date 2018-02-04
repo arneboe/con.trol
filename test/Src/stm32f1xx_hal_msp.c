@@ -48,8 +48,11 @@
   */
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx_hal.h"
-#include <hardware/Hardware.h>
 #include <hardware/ErrorHandler.h>
+
+extern I2C_HandleTypeDef hi2c1;
+extern DMA_HandleTypeDef hdma_i2c1_tx;
+extern DMA_HandleTypeDef hdma_adc1;
 
 extern void _Error_Handler(char *, int);
 /* USER CODE BEGIN 0 */
