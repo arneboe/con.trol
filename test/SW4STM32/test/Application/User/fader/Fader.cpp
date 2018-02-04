@@ -23,7 +23,7 @@ long map(long x, long in_min, long in_max, long out_min, long out_max)
 // affects the curve of movement amount > snap amount
 // smaller amounts like 0.001 make it ease slower
 // larger amounts like 0.1 make it less smooth
-#define SNAP_MULTIPLIER 0.f
+#define SNAP_MULTIPLIER 0.1f
 
 float snapCurve(uint16_t x)
 // now calculate a 'snap curve' function, where we pass in the diff (x) and get back a number from 0-1. We want small values of x to result in an output close to zero, so when the smooth value is close to the input value it'll smooth out noise aggressively by responding slowly to sudden changes. We want a small increase in x to result in a much higher output value, so medium and large movements are snappy and responsive, and aren't made sluggish by unnecessarily filtering out noise. A hyperbola (f(x) = 1/x) curve is used. First x has an offset of 1 applied, so x = 0 now results in a value of 1 from the hyperbola function. High values of x tend toward 0, but we want an output that begins at 0 and tends toward 1, so 1-y flips this up the right way. Finally the result is multiplied by 2 and capped at a maximum of one, which means that at a certain point all larger movements are maximally snappy
@@ -58,9 +58,7 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
   for (int i = 0; i < NUM_FADERS; ++i)
   {
     Faders::faders[i].update(adcValues[i]);
-
   }
-
   //start next reading
   if (HAL_ADC_Start_DMA(&hadc1, (uint32_t*) adcValues, NUM_FADERS) != HAL_OK)
     Error_Handler();

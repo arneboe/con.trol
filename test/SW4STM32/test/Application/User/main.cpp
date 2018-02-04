@@ -8,11 +8,10 @@
 
 ADC_HandleTypeDef hadc1;
 DMA_HandleTypeDef hdma_adc1;
-
 I2C_HandleTypeDef hi2c1;
 DMA_HandleTypeDef hdma_i2c1_tx;
-
 UART_HandleTypeDef huart1;
+TIM_HandleTypeDef htim2;
 
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
@@ -20,6 +19,7 @@ static void MX_DMA_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_ADC1_Init(void);
+static void MX_TIM2_Init(void);
 
 int main(void)
 {
@@ -34,8 +34,14 @@ int main(void)
   MX_I2C1_Init();
   MX_ADC1_Init();
   MX_USB_DEVICE_Init();
+  MX_TIM2_Init();
 
   Faders::start();
+
+  //wait until usb has been initialized before starting the timer. otherwise
+  //we might try to send midi data while usb is still configuring
+  HAL_Delay(500);
+  HAL_TIM_Base_Start_IT(&htim2);
 
   printf("STM32 USB MIDI INIT DONE\n");
 
@@ -43,21 +49,51 @@ int main(void)
   //the main just updates the displays.
   //everything else is done in interrupts
 
-  CCMessage msgs[20];
-  for(int i = 0; i < 20; ++i)
-  {
-	  msgs[i].channel = 0;
-	  msgs[i].virtualCable = 0;
-	  msgs[i].controlChannel = i;
-	  msgs[i].value = 30 + i;
-  }
-
   while (1)
   {
 		  HAL_Delay(500);
 
   }
 }
+
+
+extern "C"
+{
+  void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+  {
+    //update midi
+
+    //message buffer is reused every time
+    static CCMessage messages[NUM_FADERS];
+
+
+    //used to remember the last values and avoid spam,
+    //255 can never happen in midi thus it is a good initial value
+    static uint8_t lastValues[NUM_FADERS] = {255};
+
+    uint8_t nextMessageIndex = 0;
+
+    for(int i = 0; i < NUM_FADERS; ++i)
+    {
+      const uint8_t value = Faders::faders[i].midiValue;
+
+      if(value != lastValues[i])
+      {
+        lastValues[i] = value;
+        messages[nextMessageIndex].controlChannel = i;
+        messages[nextMessageIndex].value = value;
+        ++nextMessageIndex;
+      }
+    }
+
+    //if anything changed, send it
+    if(nextMessageIndex > 0)
+    {
+      Midi::sendCC(messages, nextMessageIndex);
+    }
+  }
+}
+
 
 /** System Clock Configuration
 */
@@ -277,7 +313,6 @@ static void MX_DMA_Init(void)
 */
 static void MX_GPIO_Init(void)
 {
-
   GPIO_InitTypeDef GPIO_InitStruct;
 
   /* GPIO Ports Clock Enable */
@@ -294,7 +329,37 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(LED2_GPIO_Port, &GPIO_InitStruct);
+}
 
+/* TIM2 init function */
+static void MX_TIM2_Init(void)
+{
+  TIM_ClockConfigTypeDef sClockSourceConfig;
+  TIM_MasterConfigTypeDef sMasterConfig;
+
+  htim2.Instance = TIM2;
+  htim2.Init.Prescaler = 7199;
+  htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim2.Init.Period = 10; // => 1000hz
+  htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim2, &sClockSourceConfig) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
 }
 
 

@@ -1,6 +1,5 @@
 #pragma once
 #include "stm32f1xx_hal.h"
-#include "RingBufferWithSum.h"
 
 #define NUM_FADERS 8
 
