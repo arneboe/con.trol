@@ -7,6 +7,7 @@
 #include "hardware/ErrorHandler.h"
 #include "display/Adafruit_SSD1306.h"
 #include "hardware/Hardware.h"
+#include "button/Button.h"
 
 void tcaselect(uint8_t i) {
   if (i > 7) return;
@@ -27,9 +28,57 @@ void tcaselect(uint8_t i) {
   }
 }
 
+struct Index
+{
+  uint8_t tca;
+  uint8_t fader;
+  uint8_t button;
+};
+
+Index indexMap[NUM_FADERS];
+
+
+void initIndexMap()
+{
+  indexMap[0].tca = 2;
+  indexMap[0].fader = 7;
+  indexMap[0].button = 0;
+
+  indexMap[1].tca = 3;
+  indexMap[1].fader = 6;
+  indexMap[1].button = 3;
+
+  indexMap[2].tca = 5;
+  indexMap[2].fader = 5;
+  indexMap[2].button = 2;
+
+  indexMap[3].tca = 4;
+  indexMap[3].fader = 4;
+  indexMap[3].button = 6;
+
+  indexMap[4].tca = 6;
+  indexMap[4].fader = 3;
+  indexMap[4].button = 7;
+
+  indexMap[5].tca = 7;
+  indexMap[5].fader = 2;
+  indexMap[5].button = 5;
+
+  indexMap[6].tca = 1;
+  indexMap[6].fader = 1;
+  indexMap[6].button = 1;
+
+  indexMap[7].tca = 0;
+  indexMap[7].fader = 0;
+  indexMap[7].button = 8;
+
+  //button index 4 is programm button
+
+}
+
 int main(void)
 {
-
+  initIndexMap();
   initHardware();
 
   Adafruit_SSD1306 display(hi2c1);
@@ -43,26 +92,34 @@ int main(void)
     display.waitForReady();
   }
 
-
-
   //the main just updates the displays.
   //everything else is done in interrupts
   uint8_t lastMidiValues[NUM_FADERS] = {255};
+  bool lastButtons[NUM_BUTTONS] = {false};
   while (1)
   {
-
     for(int i = 0; i < NUM_FADERS; ++i)
     {
-      const uint8_t currentValue = Faders::faders[i].midiValue;
-      if(currentValue != lastMidiValues[i])
+      const uint8_t faderI = indexMap[i].fader;
+      const uint8_t buttonI = indexMap[i].button;
+      const uint8_t tcaI = indexMap[i].tca;
+
+      const uint8_t currentValue = Faders::faders[faderI].midiValue;
+      const bool currentButtonValue = Buttons::pressed[buttonI];
+      if(currentValue != lastMidiValues[i] || currentButtonValue != lastButtons[i])
       {
         lastMidiValues[i] = currentValue;
-        tcaselect(i);
+        lastButtons[i] = currentButtonValue;
+        tcaselect(tcaI);
         display.fillHeader(BLACK);
         display.setTextColor(WHITE);
         display.setTextSize(2);
         display.setCursor(0, 0);
         display.println(currentValue);
+
+        if(currentButtonValue)
+          display.fillCircle(50, 5, 5, WHITE);
+
         if(!display.display())
         {
           printf("ERROR: Display %d did not respond\n", i);
@@ -77,13 +134,15 @@ int main(void)
 }
 
 
-
-
 extern "C"
 {
   //handle midi messages at 1000hz
   void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   {
+
+    //read button states, doesn't take any time so just do it here
+    Buttons::update();
+
     //update midi
 
     //message buffer is reused every time

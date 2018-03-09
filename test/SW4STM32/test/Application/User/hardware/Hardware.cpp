@@ -292,6 +292,20 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(LED2_GPIO_Port, &GPIO_InitStruct);
+
+
+  /**init button inputs */
+  GPIO_InitTypeDef initB;
+
+  initB.Pin = GPIO_PIN_3 | GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 |
+      GPIO_PIN_15 | GPIO_PIN_10 | GPIO_PIN_11;
+  initB.Mode = GPIO_MODE_INPUT;
+  initB.Pull = GPIO_PULLUP;
+  initB.Speed = GPIO_SPEED_FREQ_HIGH;
+
+  HAL_GPIO_Init(GPIOB, &initB);
+
+
 }
 
 /* TIM2 init function */
