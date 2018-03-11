@@ -68,7 +68,7 @@ void Element::loadText()
 {
   for(int i = 0; i < NUM_CHARS - 1; ++i)
   {
-    text[i] = 'A';
+    text[i] = 'B';
   }
   text[NUM_CHARS - 1] = '\0';
 }

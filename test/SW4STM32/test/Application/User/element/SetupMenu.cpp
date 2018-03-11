@@ -2,8 +2,6 @@
 #include "Map.h"
 #include "Element.h"
 
-#define MENU_START 16
-
 
 char* abc = " ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_=<>!/|+#";
 

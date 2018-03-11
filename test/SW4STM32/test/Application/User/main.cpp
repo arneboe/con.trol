@@ -89,7 +89,8 @@ void setupDisplayLoop(Adafruit_SSD1306& display)
       return;
     }
 
-    if(Elements::elements[setupElement].getButtonPressed() && !buttonPressed)
+    if(Elements::elements[setupElement].getButtonPressed() && !buttonPressed &&
+       HAL_GetTick() - setupEnterTime > 500)
     {
       buttonPressed = true;
       menu.buttonPressed(Elements::elements[setupElement].getLinearMidiValue());
@@ -161,6 +162,7 @@ void resetDisplays(Adafruit_SSD1306& display)
     display.fillScreen(BLACK);
     display.setTextColor(WHITE);
     display.setTextSize(2);
+    display.setCursor(0, MENU_START);
     display.println(Elements::elements[i].text);
     display.display();
 

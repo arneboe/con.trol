@@ -3,6 +3,7 @@
 
 #define NUM_ELEMS 8
 #define NUM_CHARS 31
+#define MENU_START 16
 
 class Element
 {
