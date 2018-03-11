@@ -67,6 +67,11 @@ void Elements::update()
 }
 
 
+uint8_t Element::getLinearMidiValue() const
+{
+  return Faders::faders[faderNum].getLinearMidiValue();
+}
+
 bool Element::getButtonPressed()
 {
   //debounce button, once pressed it remains pressed for at least 10ms. Once released it remains released for 10ms

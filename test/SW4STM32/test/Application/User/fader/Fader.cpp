@@ -24,6 +24,32 @@ float snapCurve(uint16_t x)
   return y;
 };
 
+
+/**taken from arduino: used for log to lin conversion
+  * https://playground.arduino.cc/Main/MultiMap */
+int multiMap(uint16_t value)
+{
+  //adc has only 12 bit resolution, everything above has to be garbage and shouldnt be there
+  if(value > 4095) value = 4095;
+
+  //last 2 values are special cases to make sure that we always reach the highest midi value.
+  //This is neccessary to compensate for integer arithmetics
+  static uint16_t potiVals[] = {0, 44, 120, 222, 345, 470, 590, 895, 1715, 2465, 3220, 4050, 4094, 4095};
+  static uint16_t midiVals[] = {0, 10, 21, 31, 42, 52, 63, 74, 84, 95, 105, 116, 127, 127};
+
+  // search right interval
+  uint8_t pos = 0;
+  while(value > potiVals[pos]) pos++;
+
+  // this will handle all exact "points" in the potiVals array
+  if (value == potiVals[pos]) return midiVals[pos];
+
+  //if the code reaches here pos is always > 0
+  // interpolate in the right segment for the rest
+  return (value - potiVals[pos-1]) * (midiVals[pos] - midiVals[pos-1]) / (potiVals[pos] - potiVals[pos-1]) + midiVals[pos-1];
+}
+
+
 //from http://damienclarke.me/code/posts/writing-a-better-noise-reducing-analogread
 void Fader::update(uint16_t adcValue)
 {
@@ -36,9 +62,23 @@ void Fader::update(uint16_t adcValue)
   averageAdcValue += (adcValue - averageAdcValue) * snap;
 
   rawAdcValue = adcValue;
-  midiValue = map((int)(averageAdcValue + 0.5f), 0, 4096, 0, 127);
+
+  if(isLinear)
+  {
+    midiValue = getLinearMidiValue();
+  }
+  else
+  {
+    midiValue = map((int)(averageAdcValue + 0.5f), 0, 4096, 0, 127);
+  }
+
   //HACK map should use 4096 as max!
   if(midiValue > 127) midiValue = 127; //can happen because we are using 4093 as maximum. sliders have different limits :D
+}
+
+uint8_t Fader::getLinearMidiValue()
+{
+  return multiMap((int)(averageAdcValue + 0.5f));
 }
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)

@@ -32,11 +32,12 @@ void SetupMenu::MainMenu::show(Adafruit_SSD1306& display, uint8_t faderValue)
   display.setTextSize(2);
   display.setCursor(0, 0);
 
-  uint8_t selection = map(faderValue, 0, 127, 2, 0);
+  uint8_t selection = map(faderValue, 0, 127, 0, 2);
   display.println("Configure");
+//  display.println(selection);
 
   display.setCursor(0, MENU_START);
-  if(selection == 0)
+  if(selection == 2)
     display.println(">> Text");
   else
     display.println("   Text");
@@ -46,7 +47,7 @@ void SetupMenu::MainMenu::show(Adafruit_SSD1306& display, uint8_t faderValue)
   else
     display.println("   Midi");
 
-  if(selection == 2)
+  if(selection == 0)
     display.println(">> Mode");
   else
     display.println("   Mode");

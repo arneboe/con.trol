@@ -19,6 +19,7 @@ private:
   bool pressedLast; //used internally in debouncing code
 public:
   uint8_t getMidiValue() const;
+  uint8_t getLinearMidiValue() const;
   bool getButtonPressed();
 
   Element(uint8_t displayNum, uint8_t faderNum, uint8_t buttonNum, uint8_t midiChannel);
