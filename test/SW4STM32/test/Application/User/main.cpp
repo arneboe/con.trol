@@ -77,14 +77,26 @@ void setupDisplayLoop(Adafruit_SSD1306& display)
 {
   static uint8_t setupElement = 0;
   static uint32_t setupEnterTime = 0;
+  static bool buttonPressed = false;
   if(setupRunning)
   {
     //allow user to abort setup after 2 seconds
-    if(Buttons::pressed[4] && HAL_GetTick() - setupEnterTime > 2000) //FIXME magic constant
+    if((Buttons::pressed[4] && HAL_GetTick() - setupEnterTime > 2000) ||
+       menu.done()) //FIXME magic constant
     {
       setupRunning = false;
       resetDisplays(display);
       return;
+    }
+
+    if(Elements::elements[setupElement].getButtonPressed() && !buttonPressed)
+    {
+      buttonPressed = true;
+      menu.buttonPressed(Elements::elements[setupElement].getLinearMidiValue());
+    }
+    else if(!Elements::elements[setupElement].getButtonPressed())
+    {
+      buttonPressed = false;
     }
 
     tcaselect(Elements::elements[setupElement].displayNum);
@@ -141,9 +153,17 @@ void resetDisplays(Adafruit_SSD1306& display)
 {
   for(int i = 0; i < 8; ++i)
   {
+    if(!waitForI2cReady(50))
+    {
+      printf("ERROR: Display %d failed\n", Elements::elements[i].displayNum);
+    }
     tcaselect(Elements::elements[i].displayNum);
     display.fillScreen(BLACK);
+    display.setTextColor(WHITE);
+    display.setTextSize(2);
+    display.println(Elements::elements[i].text);
     display.display();
+
     if(!waitForI2cReady(50))
     {
       printf("ERROR: Display %d failed\n", Elements::elements[i].displayNum);

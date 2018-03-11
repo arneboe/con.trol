@@ -54,11 +54,24 @@ void Elements::init()
 Element::Element(uint8_t displayNum, uint8_t faderNum, uint8_t buttonNum, uint8_t midiChannel) :
     displayNum(displayNum), faderNum(faderNum), buttonNum(buttonNum), midiChannel(midiChannel),
     lastButtonPress(0), lastButtonRelease(0), pressedLast(false)
-{}
+{
+  loadText();
+}
 
 Element::Element() : displayNum(0), faderNum(0), buttonNum(0), midiChannel(0), lastButtonPress(0),
     lastButtonRelease(0), pressedLast(false)
-{}
+{
+  loadText();
+}
+
+void Element::loadText()
+{
+  for(int i = 0; i < NUM_CHARS - 1; ++i)
+  {
+    text[i] = 'A';
+  }
+  text[NUM_CHARS - 1] = '\0';
+}
 
 void Elements::update()
 {

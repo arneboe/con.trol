@@ -9,15 +9,29 @@ private:
 
   struct Menu
   {
-    virtual void show(Adafruit_SSD1306& display, uint8_t faderValue) {printf("base show\n");};
-    virtual Menu* getNextMenu() = 0;
+    uint8_t elemNum;
+    virtual void show(Adafruit_SSD1306& display, uint8_t faderValue) = 0;
+    /**return null if there is no more follow up menu */
+    virtual Menu* getNextMenu(uint8_t faderValue) = 0;
+    virtual void setElemNum(uint8_t elemNum) = 0;
   };
 
+  struct TextMenu : public Menu
+  {
+    virtual void show(Adafruit_SSD1306& display, uint8_t faderValue) override;
+    virtual Menu* getNextMenu(uint8_t faderValue) override;
+    void reset();
+    virtual void setElemNum(uint8_t elemNum) override;
+    uint8_t currentCharIndex;
+    char currentChar;
+  };
 
   struct MainMenu : public Menu
   {
     virtual void show(Adafruit_SSD1306& display, uint8_t faderValue) override;
-    virtual Menu* getNextMenu() override;
+    virtual Menu* getNextMenu(uint8_t faderValue) override;
+    virtual void setElemNum(uint8_t elemNum) override;
+    TextMenu textMenu;
   };
 
 
@@ -31,5 +45,8 @@ public:
   void reset(uint8_t elemNum);
 
   /**Tell the menu that the button was pressed */
-  void buttonPressed();
+  void buttonPressed(uint8_t faderValue);
+
+  /**returns true if the setup is done */
+  bool done();
 };
