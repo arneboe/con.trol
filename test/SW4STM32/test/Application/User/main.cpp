@@ -9,6 +9,7 @@
 #include "hardware/Hardware.h"
 #include "button/Button.h"
 #include "element/Element.h"
+#include "element/SetupMenu.h"
 
 void tcaselect(uint8_t i) {
   if (i > 7) return;
@@ -29,12 +30,12 @@ void tcaselect(uint8_t i) {
   }
 }
 
-struct Index
-{
 
-};
+void updateDisplayLoop(Adafruit_SSD1306& display);
+void setupDisplayLoop(Adafruit_SSD1306& display);
 
-Index indexMap[NUM_FADERS];
+bool setupRunning = false;
+SetupMenu menu;
 
 int main(void)
 {
@@ -52,43 +53,94 @@ int main(void)
     waitForI2cReady(50);
   }
 
-  //the main just updates the displays.
-  //everything else is done in interrupts
-  uint8_t lastMidiValues[NUM_ELEMS] = {255};
-  bool lastButtons[NUM_ELEMS] = {false};
-  while (1)
+
+
+
+  while(1)
   {
+    //FIXME not debounced?!
+    const bool setupButtonPressed = Buttons::pressed[4]; //FIXME magic constant
+
+    if(setupButtonPressed || setupRunning)
+    {
+      setupDisplayLoop(display);
+    }
+    else
+    {
+      updateDisplayLoop(display);
+    }
+  }
+
+
+}
+
+
+void setupDisplayLoop(Adafruit_SSD1306& display)
+{
+  static uint8_t setupElement = 0;
+  if(setupRunning)
+  {
+    tcaselect(Elements::elements[setupElement].displayNum);
+    menu.show(display, Elements::elements[setupElement].getMidiValue());
+
+    if(!waitForI2cReady(50))
+    {
+      printf("ERROR: Display %d failed\n", Elements::elements[setupElement].displayNum);
+    }
+    HAL_Delay(100);
+
+  }
+  else
+  {
+    //wait for button to be pressed
     for(int i = 0; i < NUM_ELEMS; ++i)
     {
-      const uint8_t curentFaderValue = Elements::elements[i].getMidiValue();
-      const bool currentButtonValue = Elements::elements[i].getButtonPressed();
-      if(curentFaderValue != lastMidiValues[i] || currentButtonValue != lastButtons[i])
+      if(Elements::elements[i].getButtonPressed())
       {
-        lastMidiValues[i] = curentFaderValue;
-        lastButtons[i] = currentButtonValue;
-        tcaselect(Elements::elements[i].displayNum);
-        display.fillHeader(BLACK);
-        display.setTextColor(WHITE);
-        display.setTextSize(2);
-        display.setCursor(0, 0);
-        display.println(curentFaderValue);
-
-        if(currentButtonValue)
-          display.fillCircle(50, 5, 5, WHITE);
-
-        if(!display.display())
-        {
-          printf("ERROR: Display %d did not respond\n", i);
-        }
-        if(!waitForI2cReady(50))
-        {
-          printf("ERROR: Display %d failed\n", i);
-        }
+        setupElement = i;
+        setupRunning = true;
+        menu.reset(i);
+        break;
       }
     }
   }
 }
 
+void updateDisplayLoop(Adafruit_SSD1306& display)
+{
+  //the main just updates the displays.
+  //everything else is done in interrupts
+  static uint8_t lastMidiValues[NUM_ELEMS] = {255};
+  static bool lastButtons[NUM_ELEMS] = {false};
+  for(int i = 0; i < NUM_ELEMS; ++i)
+  {
+    const uint8_t curentFaderValue = Elements::elements[i].getMidiValue();
+    const bool currentButtonValue = Elements::elements[i].getButtonPressed();
+    if(curentFaderValue != lastMidiValues[i] || currentButtonValue != lastButtons[i])
+    {
+      lastMidiValues[i] = curentFaderValue;
+      lastButtons[i] = currentButtonValue;
+      tcaselect(Elements::elements[i].displayNum);
+      display.fillHeader(BLACK);
+      display.setTextColor(WHITE);
+      display.setTextSize(2);
+      display.setCursor(0, 0);
+      display.println(curentFaderValue);
+
+      if(currentButtonValue)
+        display.fillCircle(50, 5, 5, WHITE);
+
+      if(!display.display())
+      {
+        printf("ERROR: Display %d did not respond\n", i);
+      }
+      if(!waitForI2cReady(50))
+      {
+        printf("ERROR: Display %d failed\n", i);
+      }
+    }
+  }
+}
 
 extern "C"
 {

@@ -2,23 +2,11 @@
 #include <hardware/ErrorHandler.h>
 #include <hardware/Hardware.h>
 #include <cmath>
+#include "Map.h"
 
 Fader Faders::faders[NUM_FADERS];
 //NOTE this is later casted to uint32* but the dma is configured to write only half-words
 static uint16_t adcValues[NUM_FADERS] = { 0 };
-
-
-/**map from arduino */
-long map(long x, long in_min, long in_max, long out_min, long out_max)
-{
-  if ((in_max - in_min) > (out_max - out_min)) {
-    return (x - in_min) * (out_max - out_min+1) / (in_max - in_min+1) + out_min;
-  }
-  else
-  {
-    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-  }
-}
 
 // affects the curve of movement amount > snap amount
 // smaller amounts like 0.001 make it ease slower

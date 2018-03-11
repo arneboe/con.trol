@@ -6,11 +6,12 @@ Element Elements::elements[NUM_ELEMS];
 
 void Elements::init()
 {
+  //FIXME use ctor instead
+
   elements[0].displayNum = 2;
   elements[0].faderNum = 7;
   elements[0].buttonNum = 0;
   elements[0].midiChannel = 10;
-
 
   elements[1].displayNum = 3;
   elements[1].faderNum = 6;
