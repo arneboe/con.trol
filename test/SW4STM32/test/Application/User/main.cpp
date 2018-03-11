@@ -33,6 +33,7 @@ struct Index
   uint8_t tca;
   uint8_t fader;
   uint8_t button;
+  uint8_t midiChannel;
 };
 
 Index indexMap[NUM_FADERS];
@@ -43,36 +44,44 @@ void initIndexMap()
   indexMap[0].tca = 2;
   indexMap[0].fader = 7;
   indexMap[0].button = 0;
+  indexMap[0].midiChannel = 10;
 
   indexMap[1].tca = 3;
   indexMap[1].fader = 6;
   indexMap[1].button = 3;
+  indexMap[0].midiChannel = 11;
 
   indexMap[2].tca = 5;
   indexMap[2].fader = 5;
   indexMap[2].button = 2;
+  indexMap[0].midiChannel = 12;
 
   indexMap[3].tca = 4;
   indexMap[3].fader = 4;
   indexMap[3].button = 6;
+  indexMap[0].midiChannel = 13;
 
   indexMap[4].tca = 6;
   indexMap[4].fader = 3;
   indexMap[4].button = 7;
+  indexMap[0].midiChannel = 14;
 
   indexMap[5].tca = 7;
   indexMap[5].fader = 2;
   indexMap[5].button = 5;
+  indexMap[0].midiChannel = 15;
 
   indexMap[6].tca = 1;
   indexMap[6].fader = 1;
   indexMap[6].button = 1;
+  indexMap[0].midiChannel = 16;
 
   indexMap[7].tca = 0;
   indexMap[7].fader = 0;
   indexMap[7].button = 8;
+  indexMap[0].midiChannel = 17;
 
-  //button index 4 is programm button
+  //button index 4 is program button
 
 }
 
@@ -146,7 +155,7 @@ extern "C"
     //update midi
 
     //message buffer is reused every time
-    static CCMessage messages[NUM_FADERS];
+    static CCMessage ccMessages[NUM_FADERS];
 
 
     //used to remember the last values and avoid spam,
@@ -157,13 +166,14 @@ extern "C"
 
     for(int i = 0; i < NUM_FADERS; ++i)
     {
-      const uint8_t value = Faders::faders[i].midiValue;
+      const uint8_t faderI = indexMap[i].fader;
+      const uint8_t value = Faders::faders[faderI].midiValue;
 
       if(value != lastValues[i])
       {
         lastValues[i] = value;
-        messages[nextMessageIndex].controlChannel = i;
-        messages[nextMessageIndex].value = value;
+        ccMessages[nextMessageIndex].controlChannel = i;
+        ccMessages[nextMessageIndex].value = value;
         ++nextMessageIndex;
       }
     }
@@ -171,7 +181,7 @@ extern "C"
     //if anything changed, send it
     if(nextMessageIndex > 0)
     {
-      Midi::sendCC(messages, nextMessageIndex);
+      Midi::sendCC(ccMessages, nextMessageIndex);
     }
   }
 }
