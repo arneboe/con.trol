@@ -1,6 +1,7 @@
 #include "Element.h"
 #include "button/Button.h"
 #include "fader/Fader.h"
+#include "eeprom/eeprom.h"
 
 Element Elements::elements[NUM_ELEMS];
 
@@ -16,37 +17,40 @@ void Elements::init()
   elements[1].displayNum = 3;
   elements[1].faderNum = 6;
   elements[1].buttonNum = 3;
-  elements[0].midiChannel = 11;
+  elements[1].midiChannel = 11;
 
   elements[2].displayNum = 5;
   elements[2].faderNum = 5;
   elements[2].buttonNum = 2;
-  elements[0].midiChannel = 12;
+  elements[2].midiChannel = 12;
 
   elements[3].displayNum = 4;
   elements[3].faderNum = 4;
   elements[3].buttonNum = 6;
-  elements[0].midiChannel = 13;
+  elements[3].midiChannel = 13;
 
   elements[4].displayNum = 6;
   elements[4].faderNum = 3;
   elements[4].buttonNum = 7;
-  elements[0].midiChannel = 14;
+  elements[4].midiChannel = 14;
 
   elements[5].displayNum = 7;
   elements[5].faderNum = 2;
   elements[5].buttonNum = 5;
-  elements[0].midiChannel = 15;
+  elements[5].midiChannel = 15;
 
   elements[6].displayNum = 1;
   elements[6].faderNum = 1;
   elements[6].buttonNum = 1;
-  elements[0].midiChannel = 16;
+  elements[6].midiChannel = 16;
 
   elements[7].displayNum = 0;
   elements[7].faderNum = 0;
   elements[7].buttonNum = 8;
-  elements[0].midiChannel = 17;
+  elements[7].midiChannel = 17;
+
+  for(int i = 0; i < NUM_ELEMS; ++i)
+    loadElementConfig(i);
 
   //buttonNum index 4 is program buttonNum
 }
@@ -55,22 +59,11 @@ Element::Element(uint8_t displayNum, uint8_t faderNum, uint8_t buttonNum, uint8_
     displayNum(displayNum), faderNum(faderNum), buttonNum(buttonNum), midiChannel(midiChannel),
     lastButtonPress(0), lastButtonRelease(0), pressedLast(false)
 {
-  loadText();
 }
 
 Element::Element() : displayNum(0), faderNum(0), buttonNum(0), midiChannel(0), lastButtonPress(0),
     lastButtonRelease(0), pressedLast(false)
 {
-  loadText();
-}
-
-void Element::loadText()
-{
-  for(int i = 0; i < NUM_CHARS - 1; ++i)
-  {
-    text[i] = 'B';
-  }
-  text[NUM_CHARS - 1] = '\0';
 }
 
 void Elements::update()
@@ -117,6 +110,55 @@ bool Element::getButtonPressed()
 uint8_t Element::getMidiValue() const
 {
   return Faders::faders[faderNum].midiValue;
+}
+
+void Elements::loadElementConfig(uint8_t elemNum)
+{
+  uint16_t virtAddr = elemNum * NUM_CHARS;
+  uint16_t remainingChars = NUM_CHARS;
+  uint8_t currentChar = 0;
+  while(remainingChars >= 2)
+  {
+    uint16_t data = 0;
+    EE_ReadVariable(virtAddr, &data);
+    elements[elemNum].text[currentChar] = data; //set low byte
+    ++currentChar;
+    elements[elemNum].text[currentChar] = data >> 8; //set high byte
+    ++currentChar;
+    ++virtAddr;
+    remainingChars -= 2;
+  }
+
+  //num chars was odd,read last char
+  if(remainingChars > 0)
+  {
+    uint16_t data = 0;
+    EE_ReadVariable(virtAddr, &data);
+    elements[elemNum].text[currentChar] = data;
+  }
+
+}
+void Elements::storeElementConfig(uint8_t elemNum)
+{
+  uint16_t virtAddr = elemNum * NUM_CHARS;
+  uint16_t remainingChars = NUM_CHARS;
+  uint8_t currentChar = 0;
+  while(remainingChars >= 2)
+  {
+    uint16_t data = elements[elemNum].text[currentChar];
+    ++currentChar;
+    data = (elements[elemNum].text[currentChar] << 8) | data;
+    ++currentChar;
+    EE_WriteVariable(virtAddr, data);
+    ++virtAddr;
+    remainingChars -= 2;
+  }
+  //num chars was odd,write last char
+  if(remainingChars > 0)
+  {
+    uint16_t data = elements[elemNum].text[currentChar];
+    EE_WriteVariable(virtAddr, data);
+  }
 }
 
 

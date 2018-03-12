@@ -19,7 +19,6 @@ private:
   uint32_t lastButtonRelease; //used internally in debouncing code
   bool pressedLast; //used internally in debouncing code
 
-  void loadText();
 
 public:
   uint8_t getMidiValue() const;
@@ -37,5 +36,8 @@ struct Elements
   static Element elements[NUM_ELEMS];
   static void init();
   static void update();
+
+  static void loadElementConfig(uint8_t elemNum);
+  static void storeElementConfig(uint8_t elemNum);
 
 };

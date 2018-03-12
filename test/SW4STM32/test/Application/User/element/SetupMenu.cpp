@@ -81,6 +81,7 @@ SetupMenu::Menu* SetupMenu::TextMenu::getNextMenu(uint8_t faderValue)
   }
   else
   {
+    Elements::storeElementConfig(elemNum);
     return nullptr;
   }
 }

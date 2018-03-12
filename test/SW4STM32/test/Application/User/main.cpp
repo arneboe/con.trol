@@ -10,6 +10,11 @@
 #include "button/Button.h"
 #include "element/Element.h"
 #include "element/SetupMenu.h"
+#include "eeprom/eeprom.h"
+
+
+/**Variable types for eeprom */
+uint16_t VirtAddVarTab[NB_OF_VAR];
 
 void tcaselect(uint8_t i) {
   if (i > 7) return;
@@ -41,8 +46,15 @@ SetupMenu menu;
 
 int main(void)
 {
+  //FIXME move this to hardware?
+  //init eeprom variable ids (one id for each variable that we want to store)
+  for(int i = 0; i < NB_OF_VAR; ++i)
+  {
+    VirtAddVarTab[i] = i;
+  }
+
   initHardware();
-  Elements::init();
+
 
   Adafruit_SSD1306 display(hi2c1);
   for(int i = 0; i < 8; ++i)
@@ -51,6 +63,11 @@ int main(void)
     display.begin(SSD1306_SWITCHCAPVCC, 0x78);
     waitForI2cReady(50);
   }
+
+  //FIXME move this to hardware?
+  HAL_FLASH_Unlock();
+  EE_Init();
+  Elements::init();
 
   resetDisplays(display);
 
