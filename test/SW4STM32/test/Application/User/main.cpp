@@ -213,14 +213,13 @@ void displayHeader(Adafruit_SSD1306& display, uint8_t curentFaderValue, bool cur
   display.fillHeader(BLACK);
   display.setTextColor(WHITE);
   display.setTextSize(2);
-  display.setCursor(0, 0);
+  display.setCursor(50, 0);
   display.println(curentFaderValue);
 
   display.setTextSize(1);
-  display.setCursor(70, 0);
-  display.print("chan: ");
+  display.setCursor(110, 0);
   display.println(midiChannel);
-  display.setCursor(70, 9);
+  display.setCursor(110, 9);
   if(isLinear)
     display.println("LIN");
   else
@@ -228,7 +227,7 @@ void displayHeader(Adafruit_SSD1306& display, uint8_t curentFaderValue, bool cur
 
 
   if(currentButtonValue)
-    display.fillCircle(50, 5, 5, WHITE);
+    display.fillCircle(5, 5, 5, WHITE);
 
   if(!display.displayHeader())
   {
