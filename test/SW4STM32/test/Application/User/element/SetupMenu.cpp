@@ -126,3 +126,18 @@ void SetupMenu::TextMenu::setElemNum(uint8_t num)
   elemNum = num;
 }
 
+void SetupMenu::TextMenu::abort()
+{
+  //store the current text
+  Elements::storeElementConfig(elemNum);
+}
+
+
+
+void SetupMenu::abort()
+{
+  if(currentMenu != nullptr)
+    currentMenu->abort();
+  currentMenu = nullptr;
+}
+

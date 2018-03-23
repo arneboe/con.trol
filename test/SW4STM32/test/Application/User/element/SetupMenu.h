@@ -14,6 +14,7 @@ private:
     /**return null if there is no more follow up menu */
     virtual Menu* getNextMenu(uint8_t faderValue) = 0;
     virtual void setElemNum(uint8_t elemNum) = 0;
+    virtual void abort(){};
   };
 
   struct TextMenu : public Menu
@@ -22,6 +23,7 @@ private:
     virtual Menu* getNextMenu(uint8_t faderValue) override;
     void reset();
     virtual void setElemNum(uint8_t elemNum) override;
+    virtual void abort() override;
     uint8_t currentCharIndex;
     char currentChar;
   };
@@ -49,4 +51,8 @@ public:
 
   /**returns true if the setup is done */
   bool done();
+
+  /** Abort current menu (but save state) */
+  void abort();
+
 };

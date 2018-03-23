@@ -97,10 +97,18 @@ void setupDisplayLoop(Adafruit_SSD1306& display)
   static bool buttonPressed = false;
   if(setupRunning)
   {
-    //allow user to abort setup after 2 seconds
-    if((Buttons::pressed[4] && HAL_GetTick() - setupEnterTime > 2000) ||
-       menu.done()) //FIXME magic constant
+
+    if(menu.done())
     {
+      setupRunning = false;
+      resetDisplays(display);
+      return;
+    }
+
+    //allow user to abort setup after 2 seconds
+    if((Buttons::pressed[4] && HAL_GetTick() - setupEnterTime > 2000)) //FIXME magic constant
+    {
+      menu.abort();
       setupRunning = false;
       resetDisplays(display);
       return;
