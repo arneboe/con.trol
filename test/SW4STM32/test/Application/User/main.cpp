@@ -267,20 +267,20 @@ extern "C"
     uint8_t nextMessageIndex = 0;
 
     //check faders
-//    for(int i = 0; i < NUM_FADERS; ++i)
-//    {
-//      const uint8_t faderValue = Elements::elements[i].getMidiValue();
-//
-//      if(faderValue != lastFaderValues[i])
-//      {
-//        lastFaderValues[i] = faderValue;
-//        ccMessages[nextCCIndex].controlChannel = i;
-//        ccMessages[nextCCIndex].value = faderValue;
-//        messages[nextMessageIndex] = &ccMessages[nextCCIndex];
-//        ++nextMessageIndex;
-//        ++nextCCIndex;
-//      }
-//    }
+    for(int i = 0; i < NUM_FADERS; ++i)
+    {
+      const uint8_t faderValue = Elements::elements[i].getMidiValue();
+
+      if(faderValue != lastFaderValues[i])
+      {
+        lastFaderValues[i] = faderValue;
+        ccMessages[nextCCIndex].controlChannel = i;
+        ccMessages[nextCCIndex].value = faderValue;
+        messages[nextMessageIndex] = &ccMessages[nextCCIndex];
+        ++nextMessageIndex;
+        ++nextCCIndex;
+      }
+    }
 
     uint8_t nextNoteIndex = 0;
 
