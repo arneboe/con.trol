@@ -26,7 +26,7 @@ bool CCMessage::toBuffer(uint8_t* buffer, uint8_t bufferSize) const
   return true;
 }
 
-bool NoteMessage::toBuffer(char* buffer, uint8_t bufferSize) const
+bool NoteMessage::toBuffer(uint8_t* buffer, uint8_t bufferSize) const
 {
   //FIXME throw some error or something?!
   if(bufferSize < 4)

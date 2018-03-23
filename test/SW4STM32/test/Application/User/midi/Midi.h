@@ -12,6 +12,10 @@ public:
   static void sendCC(const CCMessage* messages, const uint8_t numMessages);
 
 
+  static void sendMessages(MidiMessage** messages, const uint8_t numMessages);
+
+
+
 
   /** Sends a note on/off message.
     * Calls errorHandler in case of error
@@ -21,6 +25,9 @@ public:
     * @return False in case of error. */
   static bool sendNote(const NoteMessage& msg);
   static bool sendNote(const NoteMessage* messages, const uint8_t numMessages);
+
+
+
 };
 
 

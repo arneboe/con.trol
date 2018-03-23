@@ -7,6 +7,8 @@ struct MidiMessage
   uint8_t virtualCable; // range [0x0 .. 0xF]
   uint8_t channel; // range [0x0 .. 0xF]
   MidiMessage(uint8_t virtualCable, uint8_t channel) : virtualCable(virtualCable), channel(channel) {}
+
+  virtual bool toBuffer(uint8_t* buffer, uint8_t bufferSize) const;
 };
 
 struct CCMessage : public MidiMessage
@@ -18,8 +20,7 @@ struct CCMessage : public MidiMessage
     MidiMessage(virtualCable, channel), controlChannel(controlChannel), value(value) {}
 
   /** @return False in case of error */
-  bool toBuffer(uint8_t* buffer, uint8_t bufferSize) const;
-
+  bool toBuffer(uint8_t* buffer, uint8_t bufferSize) const override;
 };
 
 
@@ -35,5 +36,5 @@ struct NoteMessage : public MidiMessage
               velocity(velocity), on(on) {}
 
   /** @return False in case of error */
-  bool toBuffer(char* buffer, uint8_t bufferSize) const;
+  bool toBuffer(uint8_t* buffer, uint8_t bufferSize) const override;
 };

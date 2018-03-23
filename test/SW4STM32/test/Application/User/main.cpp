@@ -251,35 +251,61 @@ extern "C"
 
     //update midi
 
-//    //message buffer is reused every time
-//    static CCMessage ccMessages[NUM_FADERS];
-//
-//
-//    //used to remember the last values and avoid spam,
-//    //255 can never happen in midi thus it is a good initial value
-//    static uint8_t lastValues[NUM_FADERS] = {255};
-//
-//    uint8_t nextMessageIndex = 0;
-//
+    //static storage locations for message structs
+    static CCMessage ccMessages[NUM_FADERS];
+    static NoteMessage noteMessages[NUM_FADERS];
+
+
+    MidiMessage* messages[16];
+
+
+    //used to remember the last values and avoid spam,
+    //255 can never happen in midi thus it is a good initial value
+    static uint8_t lastFaderValues[NUM_FADERS] = {255};
+
+    uint8_t nextCCIndex = 0;
+    uint8_t nextMessageIndex = 0;
+
+    //check faders
 //    for(int i = 0; i < NUM_FADERS; ++i)
 //    {
-//      const uint8_t faderI = indexMap[i].fader;
-//      const uint8_t value = Faders::faders[faderI].midiValue;
+//      const uint8_t faderValue = Elements::elements[i].getMidiValue();
 //
-//      if(value != lastValues[i])
+//      if(faderValue != lastFaderValues[i])
 //      {
-//        lastValues[i] = value;
-//        ccMessages[nextMessageIndex].controlChannel = i;
-//        ccMessages[nextMessageIndex].value = value;
+//        lastFaderValues[i] = faderValue;
+//        ccMessages[nextCCIndex].controlChannel = i;
+//        ccMessages[nextCCIndex].value = faderValue;
+//        messages[nextMessageIndex] = &ccMessages[nextCCIndex];
 //        ++nextMessageIndex;
+//        ++nextCCIndex;
 //      }
 //    }
-//
-//    //if anything changed, send it
-//    if(nextMessageIndex > 0)
-//    {
-//      Midi::sendCC(ccMessages, nextMessageIndex);
-//    }
+
+    uint8_t nextNoteIndex = 0;
+
+    static uint8_t lastButtonPressed[NUM_FADERS] = {0};
+    //check buttons
+    for(int i = 0; i < NUM_FADERS; ++i)
+    {
+      const bool pressed = Elements::elements[i].getButtonPressed();
+
+      if(pressed != lastButtonPressed[i])
+      {
+        lastButtonPressed[i] = pressed;
+        noteMessages[nextNoteIndex].note = Elements::elements[i].midiChannel;
+        noteMessages[nextNoteIndex].on = pressed;
+        messages[nextMessageIndex] = &noteMessages[nextNoteIndex];
+        ++nextMessageIndex;
+        ++nextNoteIndex;
+      }
+    }
+
+    //if anything changed, send it
+    if(nextMessageIndex > 0)
+    {
+      Midi::sendMessages(messages, nextMessageIndex);
+    }
   }
 }
 
