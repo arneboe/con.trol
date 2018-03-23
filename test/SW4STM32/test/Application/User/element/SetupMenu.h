@@ -34,6 +34,13 @@ private:
     virtual void abort() override;
   };
 
+  struct ModeMenu : public Menu
+  {
+    virtual void show(Adafruit_SSD1306& display, uint8_t faderValue) override;
+    virtual Menu* getNextMenu(uint8_t faderValue) override;
+    virtual void abort() override;
+  };
+
   struct MainMenu : public Menu
   {
     virtual void show(Adafruit_SSD1306& display, uint8_t faderValue) override;
@@ -41,6 +48,7 @@ private:
     virtual void setElemNum(uint8_t elemNum) override;
     TextMenu textMenu;
     MidiMenu midiMenu;
+    ModeMenu modeMenu;
   };
 
 

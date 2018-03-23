@@ -12,6 +12,7 @@ public:
   uint8_t faderNum;
   uint8_t buttonNum;
   uint8_t midiChannel;
+  bool isLinear;
   char text[NUM_CHARS];
 
 private:
@@ -25,7 +26,7 @@ public:
   uint8_t getLinearMidiValue() const;
   bool getButtonPressed();
 
-  Element(uint8_t displayNum, uint8_t faderNum, uint8_t buttonNum, uint8_t midiChannel);
+  Element(uint8_t displayNum, uint8_t faderNum, uint8_t buttonNum, uint8_t midiChannel, bool isLinear);
   Element();
 
 
@@ -40,4 +41,5 @@ struct Elements
   static void loadElementConfig(uint8_t elemNum);
   static void storeElementText(uint8_t elemNum);
   static void storeMidiChannel(uint8_t elemNum);
+  static void storeMode(uint8_t elemNum);
   };

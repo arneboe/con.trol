@@ -27,7 +27,11 @@ SetupMenu::Menu* SetupMenu::MainMenu::getNextMenu(uint8_t faderValue)
 {
 
   uint8_t selection = map(faderValue, 0, 127, 0, 2);
-  if(selection == 1)
+  if(selection == 0)
+  {
+    return &modeMenu;
+  }
+  else if(selection == 1)
   {
     return &midiMenu;
   }
@@ -124,6 +128,7 @@ void SetupMenu::MainMenu::setElemNum(uint8_t num)
   elemNum = num;
   textMenu.setElemNum(num);
   midiMenu.setElemNum(num);
+  modeMenu.setElemNum(num);
 }
 
 
@@ -155,6 +160,42 @@ void SetupMenu::MidiMenu::show(Adafruit_SSD1306& display, uint8_t faderValue)
 
   display.println(midiChannel);
   display.display();
+}
+
+void SetupMenu::ModeMenu::show(Adafruit_SSD1306& display, uint8_t faderValue)
+{
+  display.fillScreen(BLACK);
+  display.setTextColor(WHITE);
+  display.setTextSize(2);
+  display.setCursor(0, 0);
+
+  uint8_t selection = map(faderValue, 0, 127, 0, 1);
+  Elements::elements[elemNum].isLinear = (bool) selection;
+  display.println("SET MODE");
+//  display.println(selection);
+
+  display.setCursor(0, MENU_START);
+  if(selection == 1)
+    display.println(">> LIN");
+  else
+    display.println("   LIN");
+
+  if(selection == 0)
+    display.println(">> LOG");
+  else
+    display.println("   LOG");
+  display.display();
+}
+
+SetupMenu::Menu* SetupMenu::ModeMenu::getNextMenu(uint8_t faderValue)
+{
+  Elements::storeMode(elemNum);
+  return nullptr;
+}
+
+void SetupMenu::ModeMenu::abort()
+{
+  Elements::storeMode(elemNum);
 }
 
 void SetupMenu::MidiMenu::abort()

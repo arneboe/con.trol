@@ -40,7 +40,7 @@ void updateDisplayLoop(Adafruit_SSD1306& display);
 void setupDisplayLoop(Adafruit_SSD1306& display);
 void resetDisplays(Adafruit_SSD1306& display);
 void displayHeader(Adafruit_SSD1306& display, uint8_t curentFaderValue, bool currentButtonValue,
-                   uint8_t midiChannel);
+                   uint8_t midiChannel, bool isLinear);
 
 bool setupRunning = false;
 SetupMenu menu;
@@ -166,12 +166,13 @@ void updateDisplayLoop(Adafruit_SSD1306& display)
     const uint8_t curentFaderValue = Elements::elements[i].getMidiValue();
     const bool currentButtonValue = Elements::elements[i].getButtonPressed();
     const uint8_t midiChannel = Elements::elements[i].midiChannel;
+    const bool linear = Elements::elements[i].isLinear;
     if(curentFaderValue != lastMidiValues[i] || currentButtonValue != lastButtons[i])
     {
       lastMidiValues[i] = curentFaderValue;
       lastButtons[i] = currentButtonValue;
       tcaselect(Elements::elements[i].displayNum);
-      displayHeader(display, curentFaderValue, currentButtonValue, midiChannel);
+      displayHeader(display, curentFaderValue, currentButtonValue, midiChannel, linear);
     }
   }
 }
@@ -197,7 +198,8 @@ void resetDisplays(Adafruit_SSD1306& display)
     {
       printf("ERROR: Display %d failed\n", Elements::elements[i].displayNum);
     }
-    displayHeader(display, Elements::elements[i].getMidiValue(), Elements::elements[i].getButtonPressed(), Elements::elements[i].midiChannel);
+    displayHeader(display, Elements::elements[i].getMidiValue(), Elements::elements[i].getButtonPressed(),
+                  Elements::elements[i].midiChannel, Elements::elements[i].isLinear);
     if(!waitForI2cReady(50))
     {
       printf("ERROR: Display %d failed\n", Elements::elements[i].displayNum);
@@ -207,7 +209,7 @@ void resetDisplays(Adafruit_SSD1306& display)
 }
 
 void displayHeader(Adafruit_SSD1306& display, uint8_t curentFaderValue, bool currentButtonValue,
-                   uint8_t midiChannel){
+                   uint8_t midiChannel, bool isLinear){
   display.fillHeader(BLACK);
   display.setTextColor(WHITE);
   display.setTextSize(2);
@@ -218,6 +220,12 @@ void displayHeader(Adafruit_SSD1306& display, uint8_t curentFaderValue, bool cur
   display.setCursor(70, 0);
   display.print("chan: ");
   display.println(midiChannel);
+  display.setCursor(70, 9);
+  if(isLinear)
+    display.println("LIN");
+  else
+    display.println("LOG");
+
 
   if(currentButtonValue)
     display.fillCircle(50, 5, 5, WHITE);
