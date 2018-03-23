@@ -38,6 +38,6 @@ struct Elements
   static void update();
 
   static void loadElementConfig(uint8_t elemNum);
-  static void storeElementConfig(uint8_t elemNum);
-
-};
+  static void storeElementText(uint8_t elemNum);
+  static void storeMidiChannel(uint8_t elemNum);
+  };

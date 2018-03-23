@@ -13,7 +13,7 @@ private:
     virtual void show(Adafruit_SSD1306& display, uint8_t faderValue) = 0;
     /**return null if there is no more follow up menu */
     virtual Menu* getNextMenu(uint8_t faderValue) = 0;
-    virtual void setElemNum(uint8_t elemNum) = 0;
+    virtual void setElemNum(uint8_t eNum) {elemNum = eNum;};
     virtual void abort(){};
   };
 
@@ -22,10 +22,16 @@ private:
     virtual void show(Adafruit_SSD1306& display, uint8_t faderValue) override;
     virtual Menu* getNextMenu(uint8_t faderValue) override;
     void reset();
-    virtual void setElemNum(uint8_t elemNum) override;
     virtual void abort() override;
     uint8_t currentCharIndex;
     char currentChar;
+  };
+
+  struct MidiMenu : public Menu
+  {
+    virtual void show(Adafruit_SSD1306& display, uint8_t faderValue) override;
+    virtual Menu* getNextMenu(uint8_t faderValue) override;
+    virtual void abort() override;
   };
 
   struct MainMenu : public Menu
@@ -34,6 +40,7 @@ private:
     virtual Menu* getNextMenu(uint8_t faderValue) override;
     virtual void setElemNum(uint8_t elemNum) override;
     TextMenu textMenu;
+    MidiMenu midiMenu;
   };
 
 

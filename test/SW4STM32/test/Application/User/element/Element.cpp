@@ -114,6 +114,8 @@ uint8_t Element::getMidiValue() const
 
 void Elements::loadElementConfig(uint8_t elemNum)
 {
+
+  //read text
   uint16_t virtAddr = elemNum * NUM_CHARS;
   uint16_t remainingChars = NUM_CHARS;
   uint8_t currentChar = 0;
@@ -137,8 +139,13 @@ void Elements::loadElementConfig(uint8_t elemNum)
     elements[elemNum].text[currentChar] = data;
   }
 
+  //read midi value
+  virtAddr = NUM_ELEMS * NUM_CHARS + elemNum;
+  uint16_t data = 0;
+  EE_ReadVariable(virtAddr, &data);
+  elements[elemNum].midiChannel = data;
 }
-void Elements::storeElementConfig(uint8_t elemNum)
+void Elements::storeElementText(uint8_t elemNum)
 {
   uint16_t virtAddr = elemNum * NUM_CHARS;
   uint16_t remainingChars = NUM_CHARS;
@@ -160,5 +167,10 @@ void Elements::storeElementConfig(uint8_t elemNum)
     EE_WriteVariable(virtAddr, data);
   }
 }
-
+void Elements::storeMidiChannel(uint8_t elemNum)
+{
+  const uint16_t virtAddr = NUM_ELEMS * NUM_CHARS + elemNum;
+  const uint16_t data = elements[elemNum].midiChannel;
+  EE_WriteVariable(virtAddr, data);
+}
 

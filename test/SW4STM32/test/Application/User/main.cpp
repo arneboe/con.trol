@@ -39,7 +39,8 @@ void tcaselect(uint8_t i) {
 void updateDisplayLoop(Adafruit_SSD1306& display);
 void setupDisplayLoop(Adafruit_SSD1306& display);
 void resetDisplays(Adafruit_SSD1306& display);
-void displayHeader(Adafruit_SSD1306& display, uint8_t curentFaderValue, bool currentButtonValue);
+void displayHeader(Adafruit_SSD1306& display, uint8_t curentFaderValue, bool currentButtonValue,
+                   uint8_t midiChannel);
 
 bool setupRunning = false;
 SetupMenu menu;
@@ -164,12 +165,13 @@ void updateDisplayLoop(Adafruit_SSD1306& display)
   {
     const uint8_t curentFaderValue = Elements::elements[i].getMidiValue();
     const bool currentButtonValue = Elements::elements[i].getButtonPressed();
+    const uint8_t midiChannel = Elements::elements[i].midiChannel;
     if(curentFaderValue != lastMidiValues[i] || currentButtonValue != lastButtons[i])
     {
       lastMidiValues[i] = curentFaderValue;
       lastButtons[i] = currentButtonValue;
       tcaselect(Elements::elements[i].displayNum);
-      displayHeader(display, curentFaderValue, currentButtonValue);
+      displayHeader(display, curentFaderValue, currentButtonValue, midiChannel);
     }
   }
 }
@@ -195,7 +197,7 @@ void resetDisplays(Adafruit_SSD1306& display)
     {
       printf("ERROR: Display %d failed\n", Elements::elements[i].displayNum);
     }
-    displayHeader(display, Elements::elements[i].getMidiValue(), Elements::elements[i].getButtonPressed());
+    displayHeader(display, Elements::elements[i].getMidiValue(), Elements::elements[i].getButtonPressed(), Elements::elements[i].midiChannel);
     if(!waitForI2cReady(50))
     {
       printf("ERROR: Display %d failed\n", Elements::elements[i].displayNum);
@@ -204,13 +206,18 @@ void resetDisplays(Adafruit_SSD1306& display)
   }
 }
 
-void displayHeader(Adafruit_SSD1306& display, uint8_t curentFaderValue, bool currentButtonValue)
-{
+void displayHeader(Adafruit_SSD1306& display, uint8_t curentFaderValue, bool currentButtonValue,
+                   uint8_t midiChannel){
   display.fillHeader(BLACK);
   display.setTextColor(WHITE);
   display.setTextSize(2);
   display.setCursor(0, 0);
   display.println(curentFaderValue);
+
+  display.setTextSize(1);
+  display.setCursor(70, 0);
+  display.print("chan: ");
+  display.println(midiChannel);
 
   if(currentButtonValue)
     display.fillCircle(50, 5, 5, WHITE);

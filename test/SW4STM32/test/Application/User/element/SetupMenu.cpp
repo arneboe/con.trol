@@ -27,7 +27,11 @@ SetupMenu::Menu* SetupMenu::MainMenu::getNextMenu(uint8_t faderValue)
 {
 
   uint8_t selection = map(faderValue, 0, 127, 0, 2);
-  if(selection == 2)
+  if(selection == 1)
+  {
+    return &midiMenu;
+  }
+  else if(selection == 2)
   {
     textMenu.reset();
     return &textMenu;
@@ -81,7 +85,7 @@ SetupMenu::Menu* SetupMenu::TextMenu::getNextMenu(uint8_t faderValue)
   }
   else
   {
-    Elements::storeElementConfig(elemNum);
+    Elements::storeElementText(elemNum);
     return nullptr;
   }
 }
@@ -92,7 +96,7 @@ void SetupMenu::TextMenu::show(Adafruit_SSD1306& display, uint8_t faderValue)
   display.setTextColor(WHITE);
   display.setTextSize(2);
   display.setCursor(0, 0);
-  display.println("Configure");
+  display.println("SET TEXT");
 
   const uint8_t numChars = strlen(abc);
 
@@ -119,19 +123,44 @@ void SetupMenu::MainMenu::setElemNum(uint8_t num)
 {
   elemNum = num;
   textMenu.setElemNum(num);
+  midiMenu.setElemNum(num);
 }
 
-void SetupMenu::TextMenu::setElemNum(uint8_t num)
-{
-  elemNum = num;
-}
 
 void SetupMenu::TextMenu::abort()
 {
   //store the current text
-  Elements::storeElementConfig(elemNum);
+  Elements::storeElementText(elemNum);
 }
 
+SetupMenu::Menu* SetupMenu::MidiMenu::getNextMenu(uint8_t faderValue)
+{
+  Elements::storeMidiChannel(elemNum);
+  return nullptr;
+}
+
+void SetupMenu::MidiMenu::show(Adafruit_SSD1306& display, uint8_t faderValue)
+{
+  display.fillScreen(BLACK);
+  display.setTextColor(WHITE);
+  display.setTextSize(2);
+  display.setCursor(0, 0);
+  display.println("SET MIDI");
+
+  //FIXME why midi 119? There was some reason?!
+  uint8_t midiChannel = map(faderValue, 0, 127, 0, 119);
+  Elements::elements[elemNum].midiChannel = midiChannel;
+  display.setCursor(0, MENU_START);
+  display.setTextSize(2);
+
+  display.println(midiChannel);
+  display.display();
+}
+
+void SetupMenu::MidiMenu::abort()
+{
+  Elements::storeMidiChannel(elemNum);
+}
 
 
 void SetupMenu::abort()

@@ -146,7 +146,8 @@
 #define PAGE_FULL             ((uint8_t)0x80)
 
 /* Variables' number */
-#define NB_OF_VAR             (NUM_ELEMS * NUM_CHARS)
+                   //         (Text size)             + midi values
+#define NB_OF_VAR             (NUM_ELEMS * NUM_CHARS) + NUM_ELEMS
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
