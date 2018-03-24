@@ -166,7 +166,7 @@ void updateDisplayLoop(Adafruit_SSD1306& display)
     const uint8_t curentFaderValue = Elements::elements[i].getMidiValue();
     const bool currentButtonValue = Elements::elements[i].getButtonPressed();
     const uint8_t midiChannel = Elements::elements[i].midiChannel;
-    const bool linear = Elements::elements[i].isLinear;
+    const bool linear = Elements::elements[i].isLinear();
     if(curentFaderValue != lastMidiValues[i] || currentButtonValue != lastButtons[i])
     {
       lastMidiValues[i] = curentFaderValue;
@@ -199,7 +199,7 @@ void resetDisplays(Adafruit_SSD1306& display)
       printf("ERROR: Display %d failed\n", Elements::elements[i].displayNum);
     }
     displayHeader(display, Elements::elements[i].getMidiValue(), Elements::elements[i].getButtonPressed(),
-                  Elements::elements[i].midiChannel, Elements::elements[i].isLinear);
+                  Elements::elements[i].midiChannel, Elements::elements[i].isLinear());
     if(!waitForI2cReady(50))
     {
       printf("ERROR: Display %d failed\n", Elements::elements[i].displayNum);
