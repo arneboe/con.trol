@@ -270,11 +270,11 @@ extern "C"
     for(int i = 0; i < NUM_FADERS; ++i)
     {
       const uint8_t faderValue = Elements::elements[i].getMidiValue();
-
+      const uint8_t midiChannel = Elements::elements[i].midiChannel;
       if(faderValue != lastFaderValues[i])
       {
         lastFaderValues[i] = faderValue;
-        ccMessages[nextCCIndex].controlChannel = i;
+        ccMessages[nextCCIndex].controlChannel = midiChannel;
         ccMessages[nextCCIndex].value = faderValue;
         messages[nextMessageIndex] = &ccMessages[nextCCIndex];
         ++nextMessageIndex;
