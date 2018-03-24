@@ -67,11 +67,15 @@ uint8_t Fader::getLinearMidiValue()
 {
   const uint8_t midiValue = multiMap((int)(averageAdcValue + 0.5f));
   if(midiValue > 127) return 127; //happens because mapping from log to lin is not perfect (different faders have different maximums)
+  return midiValue;
 }
 
 uint8_t Fader::getLogMidiValue()
 {
-  return map((int)(averageAdcValue + 0.5f), 0, 4096, 0, 127);
+  const uint8_t midiValue = map((int)(averageAdcValue + 0.5f), 0, 4085, 0, 127);
+  //we use 4085 as maximum because most faders cant reach 4096,
+  if(midiValue > 127) return 127;//happens if value is > 4085
+  return midiValue;
 }
 
 uint8_t Fader::getMidiValue()
