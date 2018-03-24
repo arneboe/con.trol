@@ -55,9 +55,9 @@ void Elements::init()
   //buttonNum index 4 is program buttonNum
 }
 
-Element::Element(uint8_t displayNum, uint8_t faderNum, uint8_t buttonNum, uint8_t midiChannel, bool isLinear) :
+Element::Element(uint8_t displayNum, uint8_t faderNum, uint8_t buttonNum, uint8_t midiChannel) :
     displayNum(displayNum), faderNum(faderNum), buttonNum(buttonNum), midiChannel(midiChannel),
-    isLinear(isLinear), lastButtonPress(0), lastButtonRelease(0), pressedLast(false)
+    lastButtonPress(0), lastButtonRelease(0), pressedLast(false)
 {
 }
 
@@ -76,6 +76,11 @@ void Elements::update()
 uint8_t Element::getLinearMidiValue() const
 {
   return Faders::faders[faderNum].getLinearMidiValue();
+}
+
+bool Element::isLinear() const
+{
+  return Faders::faders[faderNum].isLinear;
 }
 
 bool Element::getButtonPressed()
@@ -149,7 +154,7 @@ void Elements::loadElementConfig(uint8_t elemNum)
   virtAddr = NUM_ELEMS * NUM_CHARS + NUM_ELEMS + elemNum;
   data = 0;
   EE_ReadVariable(virtAddr, &data);
-  elements[elemNum].isLinear = data;
+  Faders::faders[Elements::elements[elemNum].faderNum].isLinear = data;
 }
 
 void Elements::storeElementText(uint8_t elemNum)
@@ -185,6 +190,6 @@ void Elements::storeMidiChannel(uint8_t elemNum)
 void Elements::storeMode(uint8_t elemNum)
 {
   const uint16_t virtAddr = NUM_ELEMS * NUM_CHARS + NUM_ELEMS + elemNum;
-  const uint16_t data = elements[elemNum].isLinear;
+  const uint16_t data = Faders::faders[Elements::elements[elemNum].faderNum].isLinear;
   EE_WriteVariable(virtAddr, data);
 }

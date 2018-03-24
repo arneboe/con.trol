@@ -1,6 +1,7 @@
 #include "SetupMenu.h"
 #include "Map.h"
 #include "Element.h"
+#include <fader/Fader.h>
 
 
 char* abc = " ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_=<>!/|+#";
@@ -170,7 +171,7 @@ void SetupMenu::ModeMenu::show(Adafruit_SSD1306& display, uint8_t faderValue)
   display.setCursor(0, 0);
 
   uint8_t selection = map(faderValue, 0, 127, 0, 1);
-  Elements::elements[elemNum].isLinear = (bool) selection;
+  Faders::faders[Elements::elements[elemNum].faderNum].isLinear = (bool) selection;
   display.println("SET MODE");
 //  display.println(selection);
 
