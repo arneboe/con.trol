@@ -4,17 +4,17 @@
 #include <fader/Fader.h>
 
 
-char* abc = " ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_=<>!/|+#";
+char* abc = " ABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890";
 
 SetupMenu::SetupMenu() : elemNum(0), currentMenu(&mainMenu)
 {
 }
 
 
-void SetupMenu::show(Adafruit_SSD1306& display, uint8_t faderValue)
+void SetupMenu::show(Adafruit_SSD1306& display)
 {
   if(currentMenu != nullptr)
-    currentMenu->show(display, faderValue);
+    currentMenu->show(display);
 }
 
 void SetupMenu::reset(uint8_t elemNum)
@@ -24,9 +24,10 @@ void SetupMenu::reset(uint8_t elemNum)
   mainMenu.setElemNum(elemNum);
 }
 
-SetupMenu::Menu* SetupMenu::MainMenu::getNextMenu(uint8_t faderValue)
+SetupMenu::Menu* SetupMenu::MainMenu::getNextMenu()
 {
 
+  const uint8_t faderValue = Elements::elements[elemNum].getLogMidiValue();
   uint8_t selection = map(faderValue, 0, 127, 0, 2);
   if(selection == 0)
   {
@@ -46,13 +47,14 @@ SetupMenu::Menu* SetupMenu::MainMenu::getNextMenu(uint8_t faderValue)
 }
 
 
-void SetupMenu::MainMenu::show(Adafruit_SSD1306& display, uint8_t faderValue)
+void SetupMenu::MainMenu::show(Adafruit_SSD1306& display)
 {
   display.fillScreen(BLACK);
   display.setTextColor(WHITE);
   display.setTextSize(2);
   display.setCursor(0, 0);
 
+  const uint8_t faderValue = Elements::elements[elemNum].getLogMidiValue();
   uint8_t selection = map(faderValue, 0, 127, 0, 2);
   display.println("Configure");
 //  display.println(selection);
@@ -81,7 +83,7 @@ void SetupMenu::TextMenu::reset()
   currentCharIndex = 0;
 }
 
-SetupMenu::Menu* SetupMenu::TextMenu::getNextMenu(uint8_t faderValue)
+SetupMenu::Menu* SetupMenu::TextMenu::getNextMenu()
 {
   if(currentCharIndex < NUM_CHARS - 2) //-2 because last char is \0
   {
@@ -95,7 +97,7 @@ SetupMenu::Menu* SetupMenu::TextMenu::getNextMenu(uint8_t faderValue)
   }
 }
 
-void SetupMenu::TextMenu::show(Adafruit_SSD1306& display, uint8_t faderValue)
+void SetupMenu::TextMenu::show(Adafruit_SSD1306& display)
 {
   display.fillScreen(BLACK);
   display.setTextColor(WHITE);
@@ -104,7 +106,7 @@ void SetupMenu::TextMenu::show(Adafruit_SSD1306& display, uint8_t faderValue)
   display.println("SET TEXT");
 
   const uint8_t numChars = strlen(abc);
-
+  const uint8_t faderValue = Elements::elements[elemNum].getLogMidiValue();
   uint8_t selection = map(faderValue, 0, 127, 0, numChars - 1);
   display.setCursor(0, MENU_START);
   currentChar = abc[selection];
@@ -113,10 +115,10 @@ void SetupMenu::TextMenu::show(Adafruit_SSD1306& display, uint8_t faderValue)
   display.display();
 }
 
-void SetupMenu::buttonPressed(uint8_t faderValue)
+void SetupMenu::buttonPressed()
 {
   if(currentMenu != nullptr)
-    currentMenu = currentMenu->getNextMenu(faderValue);
+    currentMenu = currentMenu->getNextMenu();
 }
 
 bool SetupMenu::done()
@@ -139,13 +141,13 @@ void SetupMenu::TextMenu::abort()
   Elements::storeElementText(elemNum);
 }
 
-SetupMenu::Menu* SetupMenu::MidiMenu::getNextMenu(uint8_t faderValue)
+SetupMenu::Menu* SetupMenu::MidiMenu::getNextMenu()
 {
   Elements::storeMidiChannel(elemNum);
   return nullptr;
 }
 
-void SetupMenu::MidiMenu::show(Adafruit_SSD1306& display, uint8_t faderValue)
+void SetupMenu::MidiMenu::show(Adafruit_SSD1306& display)
 {
   display.fillScreen(BLACK);
   display.setTextColor(WHITE);
@@ -154,6 +156,7 @@ void SetupMenu::MidiMenu::show(Adafruit_SSD1306& display, uint8_t faderValue)
   display.println("SET MIDI");
 
   //FIXME why midi 119? There was some reason?!
+  const uint8_t faderValue = Elements::elements[elemNum].getLogMidiValue();
   uint8_t midiChannel = map(faderValue, 0, 127, 0, 119);
   Elements::elements[elemNum].midiChannel = midiChannel;
   display.setCursor(0, MENU_START);
@@ -163,13 +166,13 @@ void SetupMenu::MidiMenu::show(Adafruit_SSD1306& display, uint8_t faderValue)
   display.display();
 }
 
-void SetupMenu::ModeMenu::show(Adafruit_SSD1306& display, uint8_t faderValue)
+void SetupMenu::ModeMenu::show(Adafruit_SSD1306& display)
 {
   display.fillScreen(BLACK);
   display.setTextColor(WHITE);
   display.setTextSize(2);
   display.setCursor(0, 0);
-
+  const uint8_t faderValue = Elements::elements[elemNum].getLogMidiValue();
   uint8_t selection = map(faderValue, 0, 127, 0, 1);
   Faders::faders[Elements::elements[elemNum].faderNum].isLinear = (bool) selection;
   display.println("SET MODE");
@@ -188,7 +191,7 @@ void SetupMenu::ModeMenu::show(Adafruit_SSD1306& display, uint8_t faderValue)
   display.display();
 }
 
-SetupMenu::Menu* SetupMenu::ModeMenu::getNextMenu(uint8_t faderValue)
+SetupMenu::Menu* SetupMenu::ModeMenu::getNextMenu()
 {
   Elements::storeMode(elemNum);
   return nullptr;

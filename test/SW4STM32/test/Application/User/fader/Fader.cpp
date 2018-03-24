@@ -12,7 +12,7 @@ static uint16_t adcValues[NUM_FADERS] = { 0 };
 // smaller amounts like 0.001 make it ease slower
 // larger amounts like 0.1 make it less smooth
 //from http://damienclarke.me/code/posts/writing-a-better-noise-reducing-analogread
-#define SNAP_MULTIPLIER 0.03f
+#define SNAP_MULTIPLIER 0.04f
 
 float snapCurve(uint16_t x)
 // now calculate a 'snap curve' function, where we pass in the diff (x) and get back a number from 0-1. We want small values of x to result in an output close to zero, so when the smooth value is close to the input value it'll smooth out noise aggressively by responding slowly to sudden changes. We want a small increase in x to result in a much higher output value, so medium and large movements are snappy and responsive, and aren't made sluggish by unnecessarily filtering out noise. A hyperbola (f(x) = 1/x) curve is used. First x has an offset of 1 applied, so x = 0 now results in a value of 1 from the hyperbola function. High values of x tend toward 0, but we want an output that begins at 0 and tends toward 1, so 1-y flips this up the right way. Finally the result is multiplied by 2 and capped at a maximum of one, which means that at a certain point all larger movements are maximally snappy
@@ -34,9 +34,9 @@ int multiMap(uint16_t value)
   if(value > 4095) value = 4095;
 
 //  static uint16_t potiVals[] = {0, 44, 120, 222, 345, 470, 590, 895, 1715, 2465, 3220, 4050, 4094, 4095};
-  static uint16_t potiVals[] = {0, 87, 130, 677, 4009, 4030, 4059};
+  static float potiVals[] = {0, 12, 87, 130, 677, 4009, 4030, 4050};
 //  static uint16_t midiVals[] = {0, 10, 21, 31, 42, 52, 63, 74, 84, 95, 105, 116, 127, 127};
-  static uint16_t midiVals[] = {0, 26, 29, 70, 120, 121, 127};
+  static float midiVals[] = {0, 0, 26, 29, 70, 120, 121, 127};
 
   // search right interval
   uint8_t pos = 0;
@@ -61,25 +61,26 @@ void Fader::update(uint16_t adcValue)
   const float snap = snapCurve(diff * SNAP_MULTIPLIER);
   // calculate the exponential moving average based on the snap
   averageAdcValue += (adcValue - averageAdcValue) * snap;
-
-  rawAdcValue = adcValue;
-
-  if(isLinear)
-  {
-    midiValue = getLinearMidiValue();
-  }
-  else
-  {
-    midiValue = map((int)(averageAdcValue + 0.5f), 0, 4096, 0, 127);
-  }
-
-  //HACK map should use 4096 as max!
-  if(midiValue > 127) midiValue = 127; //can happen because we are using 4093 as maximum. sliders have different limits :D
 }
 
 uint8_t Fader::getLinearMidiValue()
 {
-  return multiMap((int)(averageAdcValue + 0.5f));
+  const uint8_t midiValue = multiMap((int)(averageAdcValue + 0.5f));
+  if(midiValue > 127) return 127; //happens because mapping from log to lin is not perfect (different faders have different maximums)
+}
+
+uint8_t Fader::getLogMidiValue()
+{
+  return map((int)(averageAdcValue + 0.5f), 0, 4096, 0, 127);
+}
+
+uint8_t Fader::getMidiValue()
+{
+  if(isLinear)
+  {
+    return getLinearMidiValue();
+  }
+  return getLogMidiValue();
 }
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)

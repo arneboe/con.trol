@@ -78,6 +78,11 @@ uint8_t Element::getLinearMidiValue() const
   return Faders::faders[faderNum].getLinearMidiValue();
 }
 
+uint8_t Element::getLogMidiValue() const
+{
+  return Faders::faders[faderNum].getLogMidiValue();
+}
+
 bool Element::isLinear() const
 {
   return Faders::faders[faderNum].isLinear;
@@ -114,7 +119,7 @@ bool Element::getButtonPressed()
 
 uint8_t Element::getMidiValue() const
 {
-  return Faders::faders[faderNum].midiValue;
+  return Faders::faders[faderNum].getMidiValue();
 }
 
 void Elements::loadElementConfig(uint8_t elemNum)

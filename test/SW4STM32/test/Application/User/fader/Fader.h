@@ -5,11 +5,11 @@
 
 struct Fader
 {
-	uint16_t rawAdcValue = 0;
 	float averageAdcValue = 0;
-	uint8_t midiValue = 0;
 	bool isLinear = false;
 	uint8_t getLinearMidiValue();
+	uint8_t getLogMidiValue();
+	uint8_t getMidiValue(); //return the correct value depending on isLinear
 	void update(uint16_t adcValue);
 };
 

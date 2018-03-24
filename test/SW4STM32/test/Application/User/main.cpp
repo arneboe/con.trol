@@ -96,9 +96,10 @@ void setupDisplayLoop(Adafruit_SSD1306& display)
   static uint8_t setupElement = 0;
   static uint32_t setupEnterTime = 0;
   static bool buttonPressed = false;
+
+  //buffers whether the fader is linear or not.
   if(setupRunning)
   {
-
     if(menu.done())
     {
       setupRunning = false;
@@ -119,7 +120,7 @@ void setupDisplayLoop(Adafruit_SSD1306& display)
        HAL_GetTick() - setupEnterTime > 500)
     {
       buttonPressed = true;
-      menu.buttonPressed(Elements::elements[setupElement].getLinearMidiValue());
+      menu.buttonPressed();
     }
     else if(!Elements::elements[setupElement].getButtonPressed())
     {
@@ -128,8 +129,7 @@ void setupDisplayLoop(Adafruit_SSD1306& display)
 
     tcaselect(Elements::elements[setupElement].displayNum);
 
-    //always use linear value for menu navigation, much smoother
-    menu.show(display, Elements::elements[setupElement].getLinearMidiValue());
+    menu.show(display);
 
     if(!waitForI2cReady(50))
     {

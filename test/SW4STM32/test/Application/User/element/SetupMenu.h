@@ -10,17 +10,17 @@ private:
   struct Menu
   {
     uint8_t elemNum;
-    virtual void show(Adafruit_SSD1306& display, uint8_t faderValue) = 0;
+    virtual void show(Adafruit_SSD1306& display) = 0;
     /**return null if there is no more follow up menu */
-    virtual Menu* getNextMenu(uint8_t faderValue) = 0;
+    virtual Menu* getNextMenu() = 0;
     virtual void setElemNum(uint8_t eNum) {elemNum = eNum;};
     virtual void abort(){};
   };
 
   struct TextMenu : public Menu
   {
-    virtual void show(Adafruit_SSD1306& display, uint8_t faderValue) override;
-    virtual Menu* getNextMenu(uint8_t faderValue) override;
+    virtual void show(Adafruit_SSD1306& display) override;
+    virtual Menu* getNextMenu() override;
     void reset();
     virtual void abort() override;
     uint8_t currentCharIndex;
@@ -29,22 +29,22 @@ private:
 
   struct MidiMenu : public Menu
   {
-    virtual void show(Adafruit_SSD1306& display, uint8_t faderValue) override;
-    virtual Menu* getNextMenu(uint8_t faderValue) override;
+    virtual void show(Adafruit_SSD1306& display) override;
+    virtual Menu* getNextMenu() override;
     virtual void abort() override;
   };
 
   struct ModeMenu : public Menu
   {
-    virtual void show(Adafruit_SSD1306& display, uint8_t faderValue) override;
-    virtual Menu* getNextMenu(uint8_t faderValue) override;
+    virtual void show(Adafruit_SSD1306& display) override;
+    virtual Menu* getNextMenu() override;
     virtual void abort() override;
   };
 
   struct MainMenu : public Menu
   {
-    virtual void show(Adafruit_SSD1306& display, uint8_t faderValue) override;
-    virtual Menu* getNextMenu(uint8_t faderValue) override;
+    virtual void show(Adafruit_SSD1306& display) override;
+    virtual Menu* getNextMenu() override;
     virtual void setElemNum(uint8_t elemNum) override;
     TextMenu textMenu;
     MidiMenu midiMenu;
@@ -56,13 +56,13 @@ private:
   Menu* currentMenu;
 public:
   SetupMenu();
-  void show(Adafruit_SSD1306& display, uint8_t faderValue);
+  void show(Adafruit_SSD1306& display);
 
   /**reset menu and set selected element  */
   void reset(uint8_t elemNum);
 
   /**Tell the menu that the button was pressed */
-  void buttonPressed(uint8_t faderValue);
+  void buttonPressed();
 
   /**returns true if the setup is done */
   bool done();
