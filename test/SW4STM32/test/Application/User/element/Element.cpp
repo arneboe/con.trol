@@ -16,7 +16,7 @@ void Elements::init()
 
   elements[1].displayNum = 3;
   elements[1].faderNum = 1;
-  elements[1].buttonNum = 3;
+  elements[1].buttonNum = 1;
   elements[1].midiChannel = 11;
 
   elements[2].displayNum = 4;
@@ -26,12 +26,12 @@ void Elements::init()
 
   elements[3].displayNum = 5;
   elements[3].faderNum = 3;
-  elements[3].buttonNum = 6;
+  elements[3].buttonNum = 3;
   elements[3].midiChannel = 13;
 
   elements[4].displayNum = 6;
   elements[4].faderNum = 4;
-  elements[4].buttonNum = 7;
+  elements[4].buttonNum = 4;
   elements[4].midiChannel = 14;
 
   elements[5].displayNum = 7;
@@ -41,18 +41,18 @@ void Elements::init()
 
   elements[6].displayNum = 1;
   elements[6].faderNum = 6;
-  elements[6].buttonNum = 1;
+  elements[6].buttonNum = 6;
   elements[6].midiChannel = 16;
 
   elements[7].displayNum = 0;
   elements[7].faderNum = 7;
-  elements[7].buttonNum = 8;
+  elements[7].buttonNum = 7;
   elements[7].midiChannel = 17;
 
   for(int i = 0; i < NUM_ELEMS; ++i)
     loadElementConfig(i);
 
-  //buttonNum index 4 is program buttonNum
+
 }
 
 Element::Element(uint8_t displayNum, uint8_t faderNum, uint8_t buttonNum, uint8_t midiChannel) :

@@ -75,7 +75,7 @@ int main(void)
   while(1)
   {
     //FIXME not debounced?!
-    const bool setupButtonPressed = Buttons::pressed[4]; //FIXME magic constant
+    const bool setupButtonPressed = Buttons::pressed[8]; //FIXME magic constant
 
     if(setupButtonPressed || setupRunning)
     {
@@ -107,8 +107,9 @@ void setupDisplayLoop(Adafruit_SSD1306& display)
       return;
     }
 
+    //FIXME magic constant button 8
     //allow user to abort setup after 2 seconds
-    if((Buttons::pressed[4] && HAL_GetTick() - setupEnterTime > 2000)) //FIXME magic constant
+    if((Buttons::pressed[8] && HAL_GetTick() - setupEnterTime > 2000)) //FIXME magic constant
     {
       menu.abort();
       setupRunning = false;
