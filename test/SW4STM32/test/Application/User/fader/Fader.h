@@ -1,11 +1,13 @@
 #pragma once
 #include "stm32f1xx_hal.h"
+#include "ResponsiveAnalogRead.h"
 
 #define NUM_FADERS 8
 
 struct Fader
 {
-	float averageAdcValue = 0;
+  float avg = 0;
+  ResponsiveAnalogRead filter;
 	bool isLinear = false;
 	uint8_t getLinearMidiValue();
 	uint8_t getLogMidiValue();
