@@ -296,6 +296,15 @@ extern "C"
         lastButtonPressed[i] = pressed;
         noteMessages[nextNoteIndex].note = Elements::elements[i].midiChannel;
         noteMessages[nextNoteIndex].on = pressed;
+        if(pressed)
+        {
+          noteMessages[nextNoteIndex].velocity = 127;
+        }
+        else
+        {
+          noteMessages[nextNoteIndex].velocity = 0;
+        }
+
         messages[nextMessageIndex] = &noteMessages[nextNoteIndex];
         ++nextMessageIndex;
         ++nextNoteIndex;
