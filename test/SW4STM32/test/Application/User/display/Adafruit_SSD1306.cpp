@@ -143,7 +143,6 @@ void Adafruit_SSD1306::begin(uint8_t vccstate, uint8_t i2caddr) {
   _i2caddr = i2caddr;
 
 
-
   // Init sequence
   ssd1306_command(SSD1306_DISPLAYOFF);                    // 0xAE
   ssd1306_command(SSD1306_SETDISPLAYCLOCKDIV);            // 0xD5
@@ -221,41 +220,69 @@ bool Adafruit_SSD1306::ssd1306_command(uint8_t c) {
 	// I2C
 	const uint8_t control = 0x00;   // Co = 0, D/C = 0
 	uint8_t data[] = {control, c};
-	if(HAL_I2C_Master_Transmit(&i2c, (uint16_t)_i2caddr, data, 2, 10000)!= HAL_OK)
-  {
-    /* Error_Handler() function is called when Timeout error occurs.
-     When Acknowledge failure occurs (Slave don't acknowledge its address)
-     Master restarts communication */
-    switch (HAL_I2C_GetError(&i2c))
-    {
-      case HAL_I2C_ERROR_NONE:  //can never happen?
-        return true;
-      case HAL_I2C_ERROR_BERR:
-        Error_Handler();
-        break;
-      case HAL_I2C_ERROR_ARLO:
-        Error_Handler();
-        break;
-      case HAL_I2C_ERROR_AF:
-        //Error_Handler();
-        //slave does not exist
-        return false;
-        break;
-      case HAL_I2C_ERROR_OVR:
-        Error_Handler();
-        break;
-      case HAL_I2C_ERROR_DMA:
-        Error_Handler();
-        break;
-      case HAL_I2C_ERROR_TIMEOUT:
-        Error_Handler();
-        break;
-      default:
-        Error_Handler();
-        break;
-    }
-  }
+
+	const HAL_StatusTypeDef transmitStatus = HAL_I2C_Master_Transmit(&i2c, (uint16_t)_i2caddr, data, 2, 100);
+
+	switch(transmitStatus)
+	{
+	  case HAL_OK: //nothing to do, transmit went fine
+	    break;
+	  case HAL_ERROR:
+	    printf("display error\n");
+	    break;
+	  case HAL_BUSY:
+	   // printf("i2c busy\n");
+	    break;
+	  case HAL_TIMEOUT:
+	    printf("display timeout\n");
+	    return false;
+	    break;
+	  default:
+	    break;
+	}
+
 	return true;
+
+//
+//	if(HAL_I2C_Master_Transmit(&i2c, (uint16_t)_i2caddr, data, 2, 100)!= HAL_OK)
+//  {
+//    /* Error_Handler() function is called when Timeout error occurs.
+//     When Acknowledge failure occurs (Slave don't acknowledge its address)
+//     Master restarts communication */
+//    switch (HAL_I2C_GetError(&i2c))
+//    {
+//      case HAL_I2C_ERROR_NONE:  //can never happen?
+//        printf("NO HAL_I2C_ERROR_NONE\n");
+//        return true;
+//      case HAL_I2C_ERROR_BERR:
+//        printf("NO HAL_I2C_ERROR_BERR\n");
+//        Error_Handler();
+//        break;
+//      case HAL_I2C_ERROR_ARLO:
+//        printf("NO HAL_I2C_ERROR_ARLO\n");
+//        Error_Handler();
+//        break;
+//      case HAL_I2C_ERROR_AF:
+//        printf("No ACK from display %d\n", _i2caddr);
+//        //Error_Handler();
+//        //slave does not exist
+//        return false;
+//      case HAL_I2C_ERROR_OVR:
+//        printf("NO HAL_I2C_ERROR_OVR\n");
+//        Error_Handler();
+//        break;
+//      case HAL_I2C_ERROR_DMA:
+//        Error_Handler();
+//        break;
+//      case HAL_I2C_ERROR_TIMEOUT:
+//        Error_Handler();
+//        break;
+//      default:
+//        Error_Handler();
+//        break;
+//    }
+//  }
+//	return true;
 }
 
 // startscrollright
