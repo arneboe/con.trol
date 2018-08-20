@@ -10,24 +10,26 @@
 //write cyle time of the eeprom.
 //i.e. how much time does the chip need to actually write the data from buffer to eeprom.
 //we cannot talk to the chip while it is writing
-#define EEPROM_WRITE 5
-#define EEPROM_TIMEOUT 5*EEPROM_WRITE  //timeout while writing
+#define EEPROM_WRITE_DELAY 10
+#define EEPROM_READ_DELAY 10
+#define EEPROM_TIMEOUT 5*EEPROM_WRITE_DELAY  //timeout while writing
 
 class Eeprom
 {
 
 public:
   Eeprom(I2C_HandleTypeDef* i2cPort);
-  HAL_StatusTypeDef readEEPROM(uint16_t address, uint8_t* MemTarget,
+  HAL_StatusTypeDef read(uint16_t address, uint8_t* MemTarget,
       uint16_t Size);
   /** @param address Address in eeprom
    *  @param MemTarget Pointe to local data that should be written
    *  @param Size Number of bytes that should be written  */
-  HAL_StatusTypeDef writeEEPROM(uint16_t address, uint8_t* MemTarget,
+  HAL_StatusTypeDef write(uint16_t address, uint8_t* MemTarget,
       uint16_t Size);
 
 
   HAL_StatusTypeDef writeByte(uint16_t address, uint8_t data);
+  HAL_StatusTypeDef readByte(uint16_t address, uint8_t& data);
 
 
 private:

@@ -20,6 +20,106 @@ static void MX_ADC1_Init(void);
 static void MX_TIM2_Init(void);
 
 
+void printI2cError(I2C_HandleTypeDef& i2c)
+{
+  switch (HAL_I2C_GetError(&i2c))
+  {
+    case HAL_I2C_ERROR_NONE: printf("I2C_ERROR_NONE\n");  return;
+    case HAL_I2C_ERROR_BERR: printf("I2C_ERROR_BERR\n"); return;
+    case HAL_I2C_ERROR_ARLO: printf("I2C_ERROR_ARLO\n"); return;
+    case HAL_I2C_ERROR_AF: printf("I2C_ERROR_AF\n"); return;
+    case HAL_I2C_ERROR_OVR: printf("I2C_ERROR_OVR\n"); return;
+    case HAL_I2C_ERROR_DMA: printf("I2C_ERROR_DMA\n"); return;
+    case HAL_I2C_ERROR_TIMEOUT: printf("I2C_ERROR_TIMEOUT\n"); return;
+    default: printf("unknown i2c error (default case)\n"); return;
+  }
+}
+
+void handleI2CReturnValue(I2C_HandleTypeDef& i2c, HAL_StatusTypeDef returnStatus)
+{
+  switch(returnStatus)
+  {
+    case HAL_OK: printf("HAL_OK\n");return;
+    case HAL_ERROR: printI2cError(i2c);return;
+    case HAL_TIMEOUT: printf("HAL_TIMEOUT\n");return;
+    case HAL_BUSY: printf("HAL_BUSY\n");return;
+    default: printf("unknown i2c return status (defaul case)\n");
+  }
+}
+
+void hardResetI2C()
+{
+  printf("Ic2 hard reset\n");
+  __HAL_RCC_I2C1_FORCE_RESET();
+  HAL_Delay(1000);
+  __HAL_RCC_I2C1_RELEASE_RESET();
+  HAL_I2C_DeInit(&hi2c1);
+  MX_I2C1_Init();
+
+}
+
+uint32_t crc32_for_byte(uint32_t r) {
+  for(int j = 0; j < 8; ++j)
+    r = (r & 1? 0: (uint32_t)0xEDB88320L) ^ r >> 1;
+  return r ^ (uint32_t)0xFF000000L;
+}
+
+void calcCrc32(const void *data, size_t n_bytes, uint32_t* crc) {
+  static uint32_t table[0x100];
+  if(!*table)
+    for(size_t i = 0; i < 0x100; ++i)
+      table[i] = crc32_for_byte(i);
+  for(size_t i = 0; i < n_bytes; ++i)
+    *crc = table[(uint8_t)*crc ^ ((uint8_t*)data)[i]] ^ *crc >> 8;
+}
+
+void hexDump(char *desc, void *addr, int len)
+{
+    int i;
+    unsigned char buff[17];
+    unsigned char *pc = (unsigned char*)addr;
+
+    // Output description if given.
+    if (desc != NULL)
+        printf ("%s:\n", desc);
+
+    // Process every byte in the data.
+    for (i = 0; i < len; i++) {
+        // Multiple of 16 means new line (with line offset).
+
+        if ((i % 16) == 0) {
+            // Just don't print ASCII for the zeroth line.
+            if (i != 0)
+                printf("  %s\n", buff);
+
+            // Output the offset.
+            printf("  %04x ", i);
+        }
+
+        // Now the hex code for the specific character.
+        printf(" %02x", pc[i]);
+
+        // And store a printable ASCII character for later.
+        if ((pc[i] < 0x20) || (pc[i] > 0x7e)) {
+            buff[i % 16] = '.';
+        } else {
+            buff[i % 16] = pc[i];
+        }
+
+        buff[(i % 16) + 1] = '\0';
+    }
+
+    // Pad out last line if not exactly 16 characters.
+    while ((i % 16) != 0) {
+        printf("   ");
+        i++;
+    }
+
+    // And print the final ASCII bit.
+    printf("  %s\n", buff);
+}
+
+
 bool waitForI2cReady(uint16_t timeoutMS)
 {
   volatile uint32_t startTime = HAL_GetTick();

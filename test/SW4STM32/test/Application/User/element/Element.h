@@ -1,18 +1,42 @@
 #pragma once
 #include <cstdint>
+#include "eeprom/eeprom.h"
 
 #define NUM_ELEMS 8
 #define NUM_CHARS 31
 #define MENU_START 16
 
+
+struct ElementUserConfig
+{
+  uint8_t midiChannel;
+  bool faderLinear;
+  char text[NUM_CHARS];
+
+  //NOTE should always be the last attribute, otherwise calculating the crc breaks
+  uint32_t crc32; //crc32 over the previous data
+
+
+  //load from eeprom
+  //@return false if load failed
+  bool load(Eeprom& eeprom, uint16_t address);
+  //store in eeprom
+  //@return false if store failed
+  bool store(Eeprom& eeprom, uint16_t address);
+
+}__attribute__((packed));
+
+
 class Element
 {
 public:
+
+  //hard coded config that depends on wiring
   uint8_t displayNum;
   uint8_t faderNum;
   uint8_t buttonNum;
-  uint8_t midiChannel;
-  char text[NUM_CHARS];
+  //user configurable part
+  ElementUserConfig userCfg;
 
 private:
   uint32_t lastButtonPress; //used internally in debouncing code

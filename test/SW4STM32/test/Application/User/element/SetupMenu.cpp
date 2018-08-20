@@ -110,8 +110,8 @@ void SetupMenu::TextMenu::show(Adafruit_SSD1306& display)
   uint8_t selection = map(faderValue, 0, 127, 0, numChars - 1);
   display.setCursor(0, MENU_START);
   currentChar = abc[selection];
-  Elements::elements[elemNum].text[currentCharIndex] = currentChar;
-  display.println(Elements::elements[elemNum].text);
+  Elements::elements[elemNum].userCfg.text[currentCharIndex] = currentChar;
+  display.println(Elements::elements[elemNum].userCfg.text);
   display.display();
 }
 
@@ -158,7 +158,7 @@ void SetupMenu::MidiMenu::show(Adafruit_SSD1306& display)
   //FIXME why midi 119? There was some reason?!
   const uint8_t faderValue = Elements::elements[elemNum].getLogMidiValue();
   uint8_t midiChannel = map(faderValue, 0, 127, 0, 119);
-  Elements::elements[elemNum].midiChannel = midiChannel;
+  Elements::elements[elemNum].userCfg.midiChannel = midiChannel;
   display.setCursor(0, MENU_START);
   display.setTextSize(2);
 

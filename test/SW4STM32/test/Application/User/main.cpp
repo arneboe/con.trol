@@ -12,16 +12,12 @@
 #include "element/SetupMenu.h"
 #include "eeprom/eeprom.h"
 
-
-/**Variable types for eeprom */
-uint16_t VirtAddVarTab[NB_OF_VAR];
-
 void tcaselect(uint8_t i) {
   if (i > 7) return;
 
   uint8_t data[1] = {1 << i};
 
-  if(HAL_I2C_Master_Transmit(&hi2c1, 0xe0, data, 1, 10000) != HAL_OK)
+  if(HAL_I2C_Master_Transmit(&hi2c1, 0xe0, data, 1, 100) != HAL_OK)
   {
     printf("Failed to set addr %d\n", i);
   }
@@ -47,14 +43,45 @@ SetupMenu menu;
 
 int main(void)
 {
-  //FIXME move this to hardware?
-  //init eeprom variable ids (one id for each variable that we want to store)
-  for(int i = 0; i < NB_OF_VAR; ++i)
-  {
-    VirtAddVarTab[i] = i;
-  }
-
   initHardware();
+
+  Eeprom eeprom(&hi2c1);
+//  aa:
+  printf("eeprom test\n");
+
+
+  uint16_t addr = 0;
+  for(int i = 0; i < 100; ++i)
+  {
+    ElementUserConfig cfg;
+    cfg.faderLinear = true;
+    cfg.midiChannel = 42;
+
+    for(int j = 0; j < NUM_CHARS; ++j)
+    {
+      cfg.text[j] = (char)i;
+    }
+    cfg.text[NUM_CHARS - 1] = '\0';
+
+    if(!cfg.store(eeprom, addr))
+    {
+      printf("store failed\n");
+    }
+    ElementUserConfig cfg2;
+    if(!cfg2.load(eeprom, addr))
+    {
+      printf("load failed\n");
+    }
+    DUMP_VAR(addr);
+    addr += sizeof(ElementUserConfig);
+
+  }
+  printf("TEST DONE\n");
+
+//  goto aa;
+
+  while(1);
+
 
 
   Adafruit_SSD1306 display(hi2c1);
@@ -65,15 +92,16 @@ int main(void)
     waitForI2cReady(50);
   }
 
-  //FIXME move this to hardware?
-  HAL_FLASH_Unlock();
-  EE_Init();
+
   Elements::init();
 
   resetDisplays(display);
 
+
+  printf("CCC\n");
   while(1)
   {
+
     //FIXME not debounced?!
     const bool setupButtonPressed = Buttons::pressed[4]; //FIXME magic constant
 
@@ -165,7 +193,7 @@ void updateDisplayLoop(Adafruit_SSD1306& display)
   {
     const uint8_t curentFaderValue = Elements::elements[i].getMidiValue();
     const bool currentButtonValue = Elements::elements[i].getButtonPressed();
-    const uint8_t midiChannel = Elements::elements[i].midiChannel;
+    const uint8_t midiChannel = Elements::elements[i].userCfg.midiChannel;
     const bool linear = Elements::elements[i].isLinear();
     if(curentFaderValue != lastMidiValues[i] || currentButtonValue != lastButtons[i])
     {
@@ -191,7 +219,7 @@ void resetDisplays(Adafruit_SSD1306& display)
     display.setTextColor(WHITE);
     display.setTextSize(2);
     display.setCursor(0, MENU_START);
-    display.println(Elements::elements[i].text);
+    display.println(Elements::elements[i].userCfg.text);
     display.display();
 
     if(!waitForI2cReady(50))
@@ -199,7 +227,7 @@ void resetDisplays(Adafruit_SSD1306& display)
       printf("ERROR: Display %d failed\n", Elements::elements[i].displayNum);
     }
     displayHeader(display, Elements::elements[i].getMidiValue(), Elements::elements[i].getButtonPressed(),
-                  Elements::elements[i].midiChannel, Elements::elements[i].isLinear());
+                  Elements::elements[i].userCfg.midiChannel, Elements::elements[i].isLinear());
     if(!waitForI2cReady(50))
     {
       printf("ERROR: Display %d failed\n", Elements::elements[i].displayNum);
@@ -270,7 +298,7 @@ extern "C"
     for(int i = 0; i < NUM_FADERS; ++i)
     {
       const uint8_t faderValue = Elements::elements[i].getMidiValue();
-      const uint8_t midiChannel = Elements::elements[i].midiChannel;
+      const uint8_t midiChannel = Elements::elements[i].userCfg.midiChannel;
       if(faderValue != lastFaderValues[i])
       {
         lastFaderValues[i] = faderValue;
@@ -293,7 +321,7 @@ extern "C"
       if(pressed != lastButtonPressed[i])
       {
         lastButtonPressed[i] = pressed;
-        noteMessages[nextNoteIndex].note = Elements::elements[i].midiChannel;
+        noteMessages[nextNoteIndex].note = Elements::elements[i].userCfg.midiChannel;
         noteMessages[nextNoteIndex].on = pressed;
         if(pressed)
         {
