@@ -32,6 +32,16 @@ public:
   HAL_StatusTypeDef readByte(uint16_t address, uint8_t& data);
 
 
+  /** Stores @p object at @p address. Stores a crc32 checksum alongside the object.
+   * @p writtenSize The number of bytes written to the eeprom (including the checksum)
+   * @note currently the maximum object size is 64 bytes, this might get fixed later  */
+  HAL_StatusTypeDef writeObjectWithCrc(uint16_t address, void* object, uint16_t objectSize, uint16_t& writtenSize);
+
+  /** Reads @p object from @p address. Reads and checks the crc32 checksum.  */
+  HAL_StatusTypeDef readObjectWithCrc(uint16_t address, void* object, uint16_t objectSize);
+
+
+
 private:
   I2C_HandleTypeDef* i2c_port;
 

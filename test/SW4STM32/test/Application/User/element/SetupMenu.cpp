@@ -174,7 +174,7 @@ void SetupMenu::ModeMenu::show(Adafruit_SSD1306& display)
   display.setCursor(0, 0);
   const uint8_t faderValue = Elements::elements[elemNum].getLogMidiValue();
   uint8_t selection = map(faderValue, 0, 127, 0, 1);
-  Faders::faders[Elements::elements[elemNum].faderNum].isLinear = (bool) selection;
+  Faders::faders[Elements::elements[elemNum].hwCfg.faderNum].isLinear = (bool) selection;
   display.println("SET MODE");
 //  display.println(selection);
 

@@ -41,6 +41,16 @@ void displayHeader(Adafruit_SSD1306& display, uint8_t curentFaderValue, bool cur
 bool setupRunning = false;
 SetupMenu menu;
 
+
+
+struct TestData
+{
+  int32_t a = 0;
+  uint8_t b = 0;
+  char str[6] = "hallo";
+  char str2[10] = "aaaaaaaaa";
+}__attribute__((packed));;
+
 int main(void)
 {
   initHardware();
@@ -53,27 +63,44 @@ int main(void)
   uint16_t addr = 0;
   for(int i = 0; i < 100; ++i)
   {
-    ElementUserConfig cfg;
-    cfg.faderLinear = true;
-    cfg.midiChannel = 42;
+    TestData write;
+    write.a = -42;
+    write.b = 44;
+    for(int j = 0; j < 5; ++j)
+      write.str[j] = (char)j;
 
-    for(int j = 0; j < NUM_CHARS; ++j)
+    uint16_t writtenSize = 0;
+    if(HAL_OK != eeprom.writeObjectWithCrc(addr, &write, sizeof(TestData), writtenSize))
     {
-      cfg.text[j] = (char)i;
+      printf("WRITE FAIL!!!\n");
+      while(1);
     }
-    cfg.text[NUM_CHARS - 1] = '\0';
 
-    if(!cfg.store(eeprom, addr))
+    TestData read;
+    if(HAL_OK != eeprom.readObjectWithCrc(addr, &read, sizeof(TestData)))
     {
-      printf("store failed\n");
+      printf("READ FAIL!!!!\n");
+      while(1);
     }
-    ElementUserConfig cfg2;
-    if(!cfg2.load(eeprom, addr))
+
+    if(write.a != read.a || write.b != read.b)
     {
-      printf("load failed\n");
+      printf("data mismatch!!\n");
+      while(1);
     }
-    DUMP_VAR(addr);
-    addr += sizeof(ElementUserConfig);
+
+    for(int j = 0; j < 6; ++j)
+    {
+      if(write.str[j] != read.str[j])
+      {
+        printf("data str mismatch!!\n");
+        while(1);
+      }
+    }
+
+
+    addr += writtenSize;
+    printf("i: %d\n", i);
 
   }
   printf("TEST DONE\n");
@@ -155,13 +182,13 @@ void setupDisplayLoop(Adafruit_SSD1306& display)
       buttonPressed = false;
     }
 
-    tcaselect(Elements::elements[setupElement].displayNum);
+    tcaselect(Elements::elements[setupElement].hwCfg.displayNum);
 
     menu.show(display);
 
     if(!waitForI2cReady(50))
     {
-      printf("ERROR: Display %d failed\n", Elements::elements[setupElement].displayNum);
+      printf("ERROR: Display %d failed\n", Elements::elements[setupElement].hwCfg.displayNum);
     }
 //    HAL_Delay(100);
 
@@ -199,7 +226,7 @@ void updateDisplayLoop(Adafruit_SSD1306& display)
     {
       lastMidiValues[i] = curentFaderValue;
       lastButtons[i] = currentButtonValue;
-      tcaselect(Elements::elements[i].displayNum);
+      tcaselect(Elements::elements[i].hwCfg.displayNum);
       displayHeader(display, curentFaderValue, currentButtonValue, midiChannel, linear);
     }
   }
@@ -212,9 +239,9 @@ void resetDisplays(Adafruit_SSD1306& display)
   {
     if(!waitForI2cReady(50))
     {
-      printf("ERROR: Display %d failed\n", Elements::elements[i].displayNum);
+      printf("ERROR: Display %d failed\n", Elements::elements[i].hwCfg.displayNum);
     }
-    tcaselect(Elements::elements[i].displayNum);
+    tcaselect(Elements::elements[i].hwCfg.displayNum);
     display.fillScreen(BLACK);
     display.setTextColor(WHITE);
     display.setTextSize(2);
@@ -224,13 +251,13 @@ void resetDisplays(Adafruit_SSD1306& display)
 
     if(!waitForI2cReady(50))
     {
-      printf("ERROR: Display %d failed\n", Elements::elements[i].displayNum);
+      printf("ERROR: Display %d failed\n", Elements::elements[i].hwCfg.displayNum);
     }
     displayHeader(display, Elements::elements[i].getMidiValue(), Elements::elements[i].getButtonPressed(),
                   Elements::elements[i].userCfg.midiChannel, Elements::elements[i].isLinear());
     if(!waitForI2cReady(50))
     {
-      printf("ERROR: Display %d failed\n", Elements::elements[i].displayNum);
+      printf("ERROR: Display %d failed\n", Elements::elements[i].hwCfg.displayNum);
     }
     //TODO display text!
   }
