@@ -35,7 +35,6 @@ int multiMap(uint16_t value)
 
 void Fader::update(uint16_t adcValue)
 {
-//  avg = 0.5f * avg + 0.5f * adcValue;
   filter.update(adcValue);
 }
 
@@ -72,6 +71,24 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
   //start next reading
   if (HAL_ADC_Start_DMA(&hadc1, (uint32_t*) adcValues, NUM_FADERS) != HAL_OK)
     Error_Handler();
+
+
+  /*
+  static uint8_t oldMidi[NUM_FADERS] = {0};
+
+  for(int i = 0; i < NUM_FADERS; ++i)
+  {
+    const uint8_t val = Faders::faders[i].getLogMidiValue();
+    if(oldMidi[i] != val)
+    {
+      oldMidi[i] = val;
+      printf("%d: %d\n",i, val);
+    }
+
+
+  }
+  */
+
 }
 
 void Faders::start()
