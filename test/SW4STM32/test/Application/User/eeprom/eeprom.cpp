@@ -162,7 +162,8 @@ HAL_StatusTypeDef Eeprom::writeObjectWithCrc(uint16_t address, void* object, uin
       //read back and verify
       //dynamic memory allocation is disabled, thus we limit the object size to 64 bytes (enough for this project)
       uint8_t buffer[64] = {0};
-      HAL_StatusTypeDef readResult = readObjectWithCrc(address, buffer, objectSize);
+      uint16_t readSize = 0;
+      HAL_StatusTypeDef readResult = readObjectWithCrc(address, buffer, objectSize, readSize);
       if(readResult == HAL_OK)
         return HAL_OK;
     }
@@ -171,12 +172,14 @@ HAL_StatusTypeDef Eeprom::writeObjectWithCrc(uint16_t address, void* object, uin
   return HAL_ERROR;
 }
 
-HAL_StatusTypeDef Eeprom::readObjectWithCrc(uint16_t address, void* object, uint16_t objectSize)
+HAL_StatusTypeDef Eeprom::readObjectWithCrc(uint16_t address, void* object, uint16_t objectSize, uint16_t& readSize)
 {
 
   if(address + objectSize + sizeof(uint32_t) >= EEPROM_SIZE)
     return HAL_ERROR;
 
+
+  readSize = objectSize + sizeof(uint32_t);
 
   //try loading several times
   for(int i = 0; i < 10; ++i)

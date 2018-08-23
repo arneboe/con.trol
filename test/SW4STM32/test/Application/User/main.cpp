@@ -12,12 +12,19 @@
 #include "element/SetupMenu.h"
 #include "eeprom/eeprom.h"
 
+
+#define I2C_MULTIPLEXER_ADDR 0xE0
+#define DISPLAY_ADDR 0x78
+
 void tcaselect(uint8_t i) {
+
+  printf("tcaselect %d\n", i);
+
   if (i > 7) return;
 
   uint8_t data[1] = {1 << i};
 
-  if(HAL_I2C_Master_Transmit(&hi2c1, 0xe0, data, 1, 100) != HAL_OK)
+  if(HAL_I2C_Master_Transmit(&hi2c1, I2C_MULTIPLEXER_ADDR, data, 1, 100) != HAL_OK)
   {
     printf("Failed to set addr %d\n", i);
   }
@@ -42,90 +49,109 @@ bool setupRunning = false;
 SetupMenu menu;
 
 
-
-struct TestData
+//method used to burn the config once
+void burnConfig(Eeprom& eeprom)
 {
-  int32_t a = 0;
-  uint8_t b = 0;
-  char str[6] = "hallo";
-  char str2[10] = "aaaaaaaaa";
-}__attribute__((packed));;
+  //8 times hw config/user config
+/*
+  ElementHardwareConfig hw;
+  ElementUserConfig user;
+
+  uint16_t addr = 0;
+  uint16_t writeSize = 0;
+
+  hw.faderNum = 0;
+  eeprom.writeObjectWithCrc(addr, &hw, sizeof(ElementHardwareConfig), writeSize);
+  addr += writeSize;
+  eeprom.writeObjectWithCrc(addr, &user, sizeof(ElementUserConfig), writeSize);
+  addr += writeSize;
+
+  hw.faderNum = 1;
+  eeprom.writeObjectWithCrc(addr, &hw, sizeof(ElementHardwareConfig), writeSize);
+  addr += writeSize;
+  eeprom.writeObjectWithCrc(addr, &user, sizeof(ElementUserConfig), writeSize);
+  addr += writeSize;
+
+  hw.faderNum = 2;
+  eeprom.writeObjectWithCrc(addr, &hw, sizeof(ElementHardwareConfig), writeSize);
+  addr += writeSize;
+  eeprom.writeObjectWithCrc(addr, &user, sizeof(ElementUserConfig), writeSize);
+  addr += writeSize;
+
+  hw.faderNum = 3;
+  eeprom.writeObjectWithCrc(addr, &hw, sizeof(ElementHardwareConfig), writeSize);
+  addr += writeSize;
+  eeprom.writeObjectWithCrc(addr, &user, sizeof(ElementUserConfig), writeSize);
+  addr += writeSize;
+
+  hw.faderNum = 4;
+  eeprom.writeObjectWithCrc(addr, &hw, sizeof(ElementHardwareConfig), writeSize);
+  addr += writeSize;
+  eeprom.writeObjectWithCrc(addr, &user, sizeof(ElementUserConfig), writeSize);
+  addr += writeSize;
+
+  hw.faderNum = 5;
+  eeprom.writeObjectWithCrc(addr, &hw, sizeof(ElementHardwareConfig), writeSize);
+  addr += writeSize;
+  eeprom.writeObjectWithCrc(addr, &user, sizeof(ElementUserConfig), writeSize);
+  addr += writeSize;
+
+  hw.faderNum = 6;
+  eeprom.writeObjectWithCrc(addr, &hw, sizeof(ElementHardwareConfig), writeSize);
+  addr += writeSize;
+  eeprom.writeObjectWithCrc(addr, &user, sizeof(ElementUserConfig), writeSize);
+  addr += writeSize;
+
+
+  hw.faderNum = 7;
+  eeprom.writeObjectWithCrc(addr, &hw, sizeof(ElementHardwareConfig), writeSize);
+  addr += writeSize;
+  eeprom.writeObjectWithCrc(addr, &user, sizeof(ElementUserConfig), writeSize);
+  addr += writeSize;
+*/
+
+}
+
 
 int main(void)
 {
   initHardware();
 
-  Eeprom eeprom(&hi2c1);
-//  aa:
-  printf("eeprom test\n");
 
 
-  uint16_t addr = 0;
-  for(int i = 0; i < 100; ++i)
+//  Eeprom eeprom(&hi2c1);
+
+  //printf("burning config\n");
+  //burnConfig(eeprom);
+  //printf("done\n");
+
+  Elements::init();
+
+
+  Adafruit_SSD1306 display(hi2c1);
+  for(int i = 0; i < NUM_ELEMS; ++i)
   {
-    TestData write;
-    write.a = -42;
-    write.b = 44;
-    for(int j = 0; j < 5; ++j)
-      write.str[j] = (char)j;
+    tcaselect(i);
 
-    uint16_t writtenSize = 0;
-    if(HAL_OK != eeprom.writeObjectWithCrc(addr, &write, sizeof(TestData), writtenSize))
+    if(HAL_I2C_IsDeviceReady(&hi2c1, DISPLAY_ADDR, 2, 10) != HAL_OK)
     {
-      printf("WRITE FAIL!!!\n");
-      while(1);
+      printf("display %d not ready!!\n", i);
+      continue;
     }
-
-    TestData read;
-    if(HAL_OK != eeprom.readObjectWithCrc(addr, &read, sizeof(TestData)))
-    {
-      printf("READ FAIL!!!!\n");
-      while(1);
-    }
-
-    if(write.a != read.a || write.b != read.b)
-    {
-      printf("data mismatch!!\n");
-      while(1);
-    }
-
-    for(int j = 0; j < 6; ++j)
-    {
-      if(write.str[j] != read.str[j])
-      {
-        printf("data str mismatch!!\n");
-        while(1);
-      }
-    }
-
-
-    addr += writtenSize;
-    printf("i: %d\n", i);
-
+    display.begin(SSD1306_SWITCHCAPVCC, DISPLAY_ADDR);
+    waitForI2cReady(50);
   }
-  printf("TEST DONE\n");
 
-//  goto aa;
+  printf("adrer dis\n");
+
+  resetDisplays(display);
+
+  printf("after reset\n");
+
 
   while(1);
 
 
-
-  Adafruit_SSD1306 display(hi2c1);
-  for(int i = 0; i < 8; ++i)
-  {
-    tcaselect(i);
-    display.begin(SSD1306_SWITCHCAPVCC, 0x78);
-    waitForI2cReady(50);
-  }
-
-
-  Elements::init();
-
-  resetDisplays(display);
-
-
-  printf("CCC\n");
   while(1)
   {
 
@@ -235,13 +261,47 @@ void updateDisplayLoop(Adafruit_SSD1306& display)
 /**sets the display text for all displays */
 void resetDisplays(Adafruit_SSD1306& display)
 {
-  for(int i = 0; i < 8; ++i)
+
+  for(int i = 0; i < NUM_ELEMS; ++i)
+  {
+    if(!waitForI2cReady(50))
+    {
+      printf("ERROR: Display %d failed\n", Elements::elements[i].hwCfg.displayNum);
+      continue;
+    }
+    tcaselect(i);
+
+    if(HAL_I2C_IsDeviceReady(&hi2c1, DISPLAY_ADDR, 2, 10) != HAL_OK)
+    {
+      printf("display %d not ready!!\n", i);
+      continue;
+    }
+
+    display.fillScreen(BLACK);
+    display.setTextColor(WHITE);
+    display.setTextSize(2);
+    display.setCursor(0, MENU_START);
+    display.println("test");
+    display.display();
+  }
+  return;
+
+
+
+  for(int i = 0; i < NUM_ELEMS; ++i)
   {
     if(!waitForI2cReady(50))
     {
       printf("ERROR: Display %d failed\n", Elements::elements[i].hwCfg.displayNum);
     }
     tcaselect(Elements::elements[i].hwCfg.displayNum);
+
+    if(HAL_I2C_IsDeviceReady(&hi2c1, DISPLAY_ADDR, 2, 10) != HAL_OK)
+    {
+      printf("display %d not ready!!\n", i);
+      continue;
+    }
+
     display.fillScreen(BLACK);
     display.setTextColor(WHITE);
     display.setTextSize(2);

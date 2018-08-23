@@ -9,16 +9,16 @@
 
 struct ElementUserConfig
 {
-  uint8_t midiChannel;
-  bool faderLinear;
+  uint8_t midiChannel = 0;
+  bool faderLinear = 0;
   char text[NUM_CHARS];
 }__attribute__((packed));
 
 struct ElementHardwareConfig
 {
-  uint8_t displayNum;
-  uint8_t faderNum;
-  uint8_t buttonNum;
+  uint8_t displayNum = 0;
+  uint8_t faderNum = 0;
+  uint8_t buttonNum = 0;
 }__attribute__((packed));
 
 
@@ -53,7 +53,13 @@ public:
 struct Elements
 {
   static Element elements[NUM_ELEMS];
+
+  //init from eeprom
+  static void init(Eeprom& eeprom);
+  //init using defaults
   static void init();
+
+  static void defaultInit();
   static void update();
 
   static void loadElementConfig(uint8_t elemNum);

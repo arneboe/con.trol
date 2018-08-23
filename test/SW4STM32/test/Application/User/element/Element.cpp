@@ -3,16 +3,34 @@
 #include "fader/Fader.h"
 #include "eeprom/eeprom.h"
 #include "Hardware.h"
+#include <cstring>
 
 Element Elements::elements[NUM_ELEMS];
 
+void Elements::init(Eeprom& eeprom)
+{
+  uint16_t addr = 0;
+  for(int i = 0; i < NUM_ELEMS; ++i)
+  {
+    uint16_t readSize = 0;
+    eeprom.readObjectWithCrc(addr, & elements[i].hwCfg, sizeof(ElementHardwareConfig), readSize);
+    addr += readSize;
+    eeprom.readObjectWithCrc(addr, & elements[i].userCfg, sizeof(ElementUserConfig), readSize);
+    addr += readSize;
+  }
+}
+
 void Elements::init()
 {
-  //FIXME use ctor instead
   for(int i = 0; i < NUM_ELEMS; ++i)
-    loadElementConfig(i);
-
-  //buttonNum index 4 is program buttonNum
+  {
+    elements[i].hwCfg.buttonNum = i;
+    elements[i].hwCfg.displayNum = i;
+    elements[i].hwCfg.faderNum = i;
+    elements[i].userCfg.faderLinear = true;
+    elements[i].userCfg.midiChannel = i;
+    strcpy(elements[i].userCfg.text, "empty");
+  }
 }
 
 Element::Element(uint8_t displayNum, uint8_t faderNum, uint8_t buttonNum, uint8_t midiChannel) :
@@ -89,46 +107,6 @@ bool Element::getButtonPressed()
 uint8_t Element::getMidiValue() const
 {
   return Faders::faders[hwCfg.faderNum].getMidiValue();
-}
-
-void Elements::loadElementConfig(uint8_t elemNum)
-{
-
-//  //read text
-//  uint16_t virtAddr = elemNum * NUM_CHARS;
-//  uint16_t remainingChars = NUM_CHARS;
-//  uint8_t currentChar = 0;
-//  while(remainingChars >= 2)
-//  {
-//    uint16_t data = 0;
-//    EE_ReadVariable(virtAddr, &data);
-//    elements[elemNum].text[currentChar] = data; //set low byte
-//    ++currentChar;
-//    elements[elemNum].text[currentChar] = data >> 8; //set high byte
-//    ++currentChar;
-//    ++virtAddr;
-//    remainingChars -= 2;
-//  }
-//
-//  //num chars was odd,read last char
-//  if(remainingChars > 0)
-//  {
-//    uint16_t data = 0;
-//    EE_ReadVariable(virtAddr, &data);
-//    elements[elemNum].text[currentChar] = data;
-//  }
-//
-//  //read midi value
-//  virtAddr = NUM_ELEMS * NUM_CHARS + elemNum;
-//  uint16_t data = 0;
-//  EE_ReadVariable(virtAddr, &data);
-//  elements[elemNum].midiChannel = data;
-//
-//  //read mode
-//  virtAddr = NUM_ELEMS * NUM_CHARS + NUM_ELEMS + elemNum;
-//  data = 0;
-//  EE_ReadVariable(virtAddr, &data);
-//  Faders::faders[Elements::elements[elemNum].faderNum].isLinear = data;
 }
 
 void Elements::storeElementText(uint8_t elemNum)

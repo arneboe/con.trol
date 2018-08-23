@@ -37,8 +37,9 @@ public:
    * @note currently the maximum object size is 64 bytes, this might get fixed later  */
   HAL_StatusTypeDef writeObjectWithCrc(uint16_t address, void* object, uint16_t objectSize, uint16_t& writtenSize);
 
-  /** Reads @p object from @p address. Reads and checks the crc32 checksum.  */
-  HAL_StatusTypeDef readObjectWithCrc(uint16_t address, void* object, uint16_t objectSize);
+  /** Reads @p object from @p address. Reads and checks the crc32 checksum.
+   * @param readSize Number of bytes read (including the crc)  */
+  HAL_StatusTypeDef readObjectWithCrc(uint16_t address, void* object, uint16_t objectSize, uint16_t& readSize);
 
 
 
