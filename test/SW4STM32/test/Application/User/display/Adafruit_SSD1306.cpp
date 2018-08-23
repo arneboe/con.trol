@@ -204,7 +204,6 @@ void Adafruit_SSD1306::begin(uint8_t vccstate, uint8_t i2caddr) {
 
   ssd1306_command(SSD1306_DISPLAYON);//--turn on oled panel
 
-  printf("disp Z\n");
 }
 
 
