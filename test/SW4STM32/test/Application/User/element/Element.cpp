@@ -10,19 +10,29 @@ Element Elements::elements[NUM_ELEMS];
 void Elements::init(Eeprom& eeprom)
 {
   uint16_t addr = 0;
-  for(int i = 0; i < NUM_ELEMS; ++i)
+  for (int i = 0; i < NUM_ELEMS; ++i)
   {
     uint16_t readSize = 0;
-    eeprom.readObjectWithCrc(addr, & elements[i].hwCfg, sizeof(ElementHardwareConfig), readSize);
+    eeprom.readObjectWithCrc(addr, &elements[i].hwCfg,
+        sizeof(ElementHardwareConfig), readSize);
     addr += readSize;
-    eeprom.readObjectWithCrc(addr, & elements[i].userCfg, sizeof(ElementUserConfig), readSize);
+    eeprom.readObjectWithCrc(addr, &elements[i].userCfg,
+        sizeof(ElementUserConfig), readSize);
     addr += readSize;
+
+//    printf("Element: %d\n", i);
+//    DUMP_VAR(elements[i].hwCfg.buttonNum);
+//    DUMP_VAR(elements[i].hwCfg.displayNum);
+//    DUMP_VAR(elements[i].hwCfg.faderNum);
+//    printf("---\n");
+
+
   }
 }
 
 void Elements::init()
 {
-  for(int i = 0; i < NUM_ELEMS; ++i)
+  for (int i = 0; i < NUM_ELEMS; ++i)
   {
     elements[i].hwCfg.buttonNum = i;
     elements[i].hwCfg.displayNum = i;
@@ -33,7 +43,8 @@ void Elements::init()
   }
 }
 
-Element::Element(uint8_t displayNum, uint8_t faderNum, uint8_t buttonNum, uint8_t midiChannel) :
+Element::Element(uint8_t displayNum, uint8_t faderNum, uint8_t buttonNum,
+    uint8_t midiChannel) :
     lastButtonPress(0), lastButtonRelease(0), pressedLast(false)
 {
   hwCfg.buttonNum = buttonNum;
@@ -43,8 +54,8 @@ Element::Element(uint8_t displayNum, uint8_t faderNum, uint8_t buttonNum, uint8_
   userCfg.midiChannel = 0;
 }
 
-Element::Element() :  lastButtonPress(0),
-    lastButtonRelease(0), pressedLast(false)
+Element::Element() :
+    lastButtonPress(0), lastButtonRelease(0), pressedLast(false)
 {
   hwCfg.buttonNum = 0;
   hwCfg.displayNum = 0;
@@ -58,7 +69,6 @@ void Elements::update()
   Buttons::update();
   //Faders update automatically
 }
-
 
 uint8_t Element::getLinearMidiValue() const
 {
@@ -78,17 +88,16 @@ bool Element::isLinear() const
 bool Element::getButtonPressed()
 {
   //debounce button, once pressed it remains pressed for at least 10ms. Once released it remains released for 10ms
-  if(HAL_GetTick() - lastButtonPress < 10)
+  if (HAL_GetTick() - lastButtonPress < 10)
     return true;
 
-  if(HAL_GetTick() - lastButtonRelease < 10)
+  if (HAL_GetTick() - lastButtonRelease < 10)
     return false;
 
-
-  if(Buttons::pressed[hwCfg.buttonNum])
+  if (Buttons::pressed[hwCfg.buttonNum])
   {
     //only set the start time the first time we enter this place
-    if(!pressedLast)
+    if (!pressedLast)
       lastButtonPress = HAL_GetTick();
 
     pressedLast = true;
@@ -97,7 +106,7 @@ bool Element::getButtonPressed()
   else
   {
     //only set the release time the first time we release
-    if(pressedLast)
+    if (pressedLast)
       lastButtonRelease = HAL_GetTick();
     pressedLast = false;
     return false;

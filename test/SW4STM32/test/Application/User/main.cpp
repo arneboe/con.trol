@@ -15,10 +15,12 @@
 
 #define I2C_MULTIPLEXER_ADDR 0xE0
 #define DISPLAY_ADDR 0x78
+#define EEPROM_ADDR 0xA0
+#define SETUP_BUTTON_NUM 0
 
 void tcaselect(uint8_t i) {
 
-  printf("tcaselect %d\n", i);
+//  printf("tcaselect %d\n", i);
 
   if (i > 7) return;
 
@@ -52,64 +54,214 @@ SetupMenu menu;
 //method used to burn the config once
 void burnConfig(Eeprom& eeprom)
 {
-  //8 times hw config/user config
-/*
   ElementHardwareConfig hw;
   ElementUserConfig user;
 
   uint16_t addr = 0;
   uint16_t writeSize = 0;
 
-  hw.faderNum = 0;
-  eeprom.writeObjectWithCrc(addr, &hw, sizeof(ElementHardwareConfig), writeSize);
-  addr += writeSize;
-  eeprom.writeObjectWithCrc(addr, &user, sizeof(ElementUserConfig), writeSize);
-  addr += writeSize;
-
-  hw.faderNum = 1;
-  eeprom.writeObjectWithCrc(addr, &hw, sizeof(ElementHardwareConfig), writeSize);
-  addr += writeSize;
-  eeprom.writeObjectWithCrc(addr, &user, sizeof(ElementUserConfig), writeSize);
-  addr += writeSize;
-
-  hw.faderNum = 2;
-  eeprom.writeObjectWithCrc(addr, &hw, sizeof(ElementHardwareConfig), writeSize);
-  addr += writeSize;
-  eeprom.writeObjectWithCrc(addr, &user, sizeof(ElementUserConfig), writeSize);
+  hw.faderNum = 7;
+  hw.buttonNum = 8;
+  hw.displayNum = 0;
+  user.midiChannel = 0;
+  user.faderLinear = false;
+  strcpy(user.text, "Unused");
+  if(HAL_ERROR == eeprom.writeObjectWithCrc(addr, &hw, sizeof(ElementHardwareConfig), writeSize))
+  {
+    printf("config write error!!!\n");
+    return;
+  }
   addr += writeSize;
 
-  hw.faderNum = 3;
-  eeprom.writeObjectWithCrc(addr, &hw, sizeof(ElementHardwareConfig), writeSize);
-  addr += writeSize;
-  eeprom.writeObjectWithCrc(addr, &user, sizeof(ElementUserConfig), writeSize);
+  if(HAL_ERROR == eeprom.writeObjectWithCrc(addr, &user, sizeof(ElementUserConfig), writeSize))
+  {
+    printf("config write error!!!\n");
+    return;
+  }
   addr += writeSize;
 
-  hw.faderNum = 4;
-  eeprom.writeObjectWithCrc(addr, &hw, sizeof(ElementHardwareConfig), writeSize);
+
+//  printf("reading bytes: \n");
+//  for(int i = 0; i < addr; ++i)
+//  {
+//    uint8_t data = 42;
+//    if(HAL_OK != eeprom.readByte(i,data))
+//    {
+//      printf("READ ERROR\n");
+//      return;
+//    }
+//    printf("%d ", data);
+//  }
+//  printf("\n");
+
+
+
+
+  hw.faderNum = 6;
+  hw.buttonNum = 7;
+  hw.displayNum = 1;
+  ++user.midiChannel;
+  if(HAL_ERROR == eeprom.writeObjectWithCrc(addr, &hw, sizeof(ElementHardwareConfig), writeSize))
+  {
+    printf("config write error!!!\n");
+    return;
+  }
   addr += writeSize;
-  eeprom.writeObjectWithCrc(addr, &user, sizeof(ElementUserConfig), writeSize);
+
+  if(HAL_ERROR == eeprom.writeObjectWithCrc(addr, &user, sizeof(ElementUserConfig), writeSize))
+  {
+    printf("config write error!!!\n");
+    return;
+  }
   addr += writeSize;
 
   hw.faderNum = 5;
-  eeprom.writeObjectWithCrc(addr, &hw, sizeof(ElementHardwareConfig), writeSize);
-  addr += writeSize;
-  eeprom.writeObjectWithCrc(addr, &user, sizeof(ElementUserConfig), writeSize);
+  hw.buttonNum = 6;
+  hw.displayNum = 2;
+  ++user.midiChannel;
+  if(HAL_ERROR == eeprom.writeObjectWithCrc(addr, &hw, sizeof(ElementHardwareConfig), writeSize))
+  {
+    printf("config write error!!!\n");
+    return;
+  }
   addr += writeSize;
 
-  hw.faderNum = 6;
-  eeprom.writeObjectWithCrc(addr, &hw, sizeof(ElementHardwareConfig), writeSize);
+  if(HAL_ERROR == eeprom.writeObjectWithCrc(addr, &user, sizeof(ElementUserConfig), writeSize))
+  {
+    printf("config write error!!!\n");
+    return;
+  }
   addr += writeSize;
-  eeprom.writeObjectWithCrc(addr, &user, sizeof(ElementUserConfig), writeSize);
+
+  hw.faderNum = 4;
+  hw.buttonNum = 5;
+  hw.displayNum = 3;
+  ++user.midiChannel;
+  if(HAL_ERROR == eeprom.writeObjectWithCrc(addr, &hw, sizeof(ElementHardwareConfig), writeSize))
+  {
+    printf("config write error!!!\n");
+    return;
+  }
+  addr += writeSize;
+
+  if(HAL_ERROR == eeprom.writeObjectWithCrc(addr, &user, sizeof(ElementUserConfig), writeSize))
+  {
+    printf("config write error!!!\n");
+    return;
+  }
+  addr += writeSize;
+
+  hw.faderNum = 0;
+  hw.buttonNum = 4;
+  hw.displayNum = 4;
+  ++user.midiChannel;
+  if(HAL_ERROR == eeprom.writeObjectWithCrc(addr, &hw, sizeof(ElementHardwareConfig), writeSize))
+  {
+    printf("config write error!!!\n");
+    return;
+  }
+  addr += writeSize;
+
+  if(HAL_ERROR == eeprom.writeObjectWithCrc(addr, &user, sizeof(ElementUserConfig), writeSize))
+  {
+    printf("config write error!!!\n");
+    return;
+  }
+  addr += writeSize;
+
+  hw.faderNum = 1;
+  hw.buttonNum = 3;
+  hw.displayNum = 5;
+  ++user.midiChannel;
+  if(HAL_ERROR == eeprom.writeObjectWithCrc(addr, &hw, sizeof(ElementHardwareConfig), writeSize))
+  {
+    printf("config write error!!!\n");
+    return;
+  }
+  addr += writeSize;
+
+  if(HAL_ERROR == eeprom.writeObjectWithCrc(addr, &user, sizeof(ElementUserConfig), writeSize))
+  {
+    printf("config write error!!!\n");
+    return;
+  }
+  addr += writeSize;
+
+  hw.faderNum = 2;
+  hw.buttonNum = 2;
+  hw.displayNum = 6;
+  ++user.midiChannel;
+  if(HAL_ERROR == eeprom.writeObjectWithCrc(addr, &hw, sizeof(ElementHardwareConfig), writeSize))
+  {
+    printf("config write error!!!\n");
+    return;
+  }
+  addr += writeSize;
+
+  if(HAL_ERROR == eeprom.writeObjectWithCrc(addr, &user, sizeof(ElementUserConfig), writeSize))
+  {
+    printf("config write error!!!\n");
+    return;
+  }
   addr += writeSize;
 
 
-  hw.faderNum = 7;
-  eeprom.writeObjectWithCrc(addr, &hw, sizeof(ElementHardwareConfig), writeSize);
+  hw.faderNum = 3;
+  hw.buttonNum = 1;
+  hw.displayNum = 7;
+  ++user.midiChannel;
+  if(HAL_ERROR == eeprom.writeObjectWithCrc(addr, &hw, sizeof(ElementHardwareConfig), writeSize))
+  {
+    printf("config write error!!!\n");
+    return;
+  }
   addr += writeSize;
-  eeprom.writeObjectWithCrc(addr, &user, sizeof(ElementUserConfig), writeSize);
-  addr += writeSize;
-*/
 
+  if(HAL_ERROR == eeprom.writeObjectWithCrc(addr, &user, sizeof(ElementUserConfig), writeSize))
+  {
+    printf("config write error!!!\n");
+    return;
+  }
+  addr += writeSize;
+
+
+
+  //read and print config for human validation
+  ElementHardwareConfig hwRead;
+  ElementUserConfig userRead;
+  uint16_t readAddr = 0;
+  uint16_t readSize = 0;
+
+
+  for(int i = 0; i < 8; ++i)
+  {
+    if(HAL_OK == eeprom.readObjectWithCrc(readAddr, &hwRead, sizeof(ElementHardwareConfig), readSize))
+    {
+      readAddr += readSize;
+      printf("Reading Element %d\n",i);
+      DUMP_VAR(hwRead.buttonNum);
+      DUMP_VAR(hwRead.displayNum);
+      DUMP_VAR(hwRead.faderNum);
+      if(HAL_OK == eeprom.readObjectWithCrc(readAddr, &userRead, sizeof(ElementUserConfig), readSize))
+      {
+        readAddr += readSize;
+        DUMP_VAR(userRead.faderLinear);
+        DUMP_VAR(userRead.midiChannel);
+        printf("Text: %s\n", userRead.text);
+      }
+      else
+      {
+        printf("READ ERROR!!\n");
+        return;
+      }
+    }
+    else
+    {
+      printf("READ ERROR ELEMENT %d\n", i);
+      return;
+    }
+    printf("-----------------------\n");
+  }
 }
 
 
@@ -117,16 +269,16 @@ int main(void)
 {
   initHardware();
 
+  Eeprom eeprom(&hi2c1);
 
+  //use this code to initially burn the config
+ // printf("burning config\n");
+ // burnConfig(eeprom);
+ // printf("done\n");
+ // printf("HALT\n");
+ // while(1);
 
-//  Eeprom eeprom(&hi2c1);
-
-  //printf("burning config\n");
-  //burnConfig(eeprom);
-  //printf("done\n");
-
-  Elements::init();
-
+  Elements::init(eeprom);
 
   Adafruit_SSD1306 display(hi2c1);
   for(int i = 0; i < NUM_ELEMS; ++i)
@@ -141,22 +293,13 @@ int main(void)
     display.begin(SSD1306_SWITCHCAPVCC, DISPLAY_ADDR);
     waitForI2cReady(50);
   }
-
-  printf("adrer dis\n");
-
   resetDisplays(display);
-
-  printf("after reset\n");
-
-
-  while(1);
-
 
   while(1)
   {
 
     //FIXME not debounced?!
-    const bool setupButtonPressed = Buttons::pressed[4]; //FIXME magic constant
+    const bool setupButtonPressed = Buttons::pressed[SETUP_BUTTON_NUM];
 
     if(setupButtonPressed || setupRunning)
     {
@@ -189,7 +332,7 @@ void setupDisplayLoop(Adafruit_SSD1306& display)
     }
 
     //allow user to abort setup after 2 seconds
-    if((Buttons::pressed[4] && HAL_GetTick() - setupEnterTime > 2000)) //FIXME magic constant
+    if((Buttons::pressed[SETUP_BUTTON_NUM] && HAL_GetTick() - setupEnterTime > 2000))
     {
       menu.abort();
       setupRunning = false;
@@ -261,33 +404,6 @@ void updateDisplayLoop(Adafruit_SSD1306& display)
 /**sets the display text for all displays */
 void resetDisplays(Adafruit_SSD1306& display)
 {
-
-  for(int i = 0; i < NUM_ELEMS; ++i)
-  {
-    if(!waitForI2cReady(50))
-    {
-      printf("ERROR: Display %d failed\n", Elements::elements[i].hwCfg.displayNum);
-      continue;
-    }
-    tcaselect(i);
-
-    if(HAL_I2C_IsDeviceReady(&hi2c1, DISPLAY_ADDR, 2, 10) != HAL_OK)
-    {
-      printf("display %d not ready!!\n", i);
-      continue;
-    }
-
-    display.fillScreen(BLACK);
-    display.setTextColor(WHITE);
-    display.setTextSize(2);
-    display.setCursor(0, MENU_START);
-    display.println("test");
-    display.display();
-  }
-  return;
-
-
-
   for(int i = 0; i < NUM_ELEMS; ++i)
   {
     if(!waitForI2cReady(50))
@@ -319,7 +435,6 @@ void resetDisplays(Adafruit_SSD1306& display)
     {
       printf("ERROR: Display %d failed\n", Elements::elements[i].hwCfg.displayNum);
     }
-    //TODO display text!
   }
 }
 

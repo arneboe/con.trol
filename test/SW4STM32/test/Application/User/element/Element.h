@@ -10,8 +10,8 @@
 struct ElementUserConfig
 {
   uint8_t midiChannel = 0;
-  bool faderLinear = 0;
-  char text[NUM_CHARS];
+  bool faderLinear = false;
+  char text[NUM_CHARS] = "UNUSED";
 }__attribute__((packed));
 
 struct ElementHardwareConfig

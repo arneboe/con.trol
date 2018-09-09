@@ -120,7 +120,7 @@ HAL_StatusTypeDef Eeprom::write(uint16_t address, uint8_t* MemTarget,
     //byte-wise and be done with it.
     //TODO implement perfect page-wise writing
 
-    printf("multi: %d\n", address);
+//    printf("multi: %d\n", address);
     for (int i = 0; i < size; ++i)
     {
       result = writeByte(address + i, MemTarget[i]);
@@ -137,7 +137,9 @@ HAL_StatusTypeDef Eeprom::write(uint16_t address, uint8_t* MemTarget,
 HAL_StatusTypeDef Eeprom::writeObjectWithCrc(uint16_t address, void* object, uint16_t objectSize, uint16_t& writtenSize)
 {
 
-  if(address + objectSize + sizeof(uint32_t) >= EEPROM_SIZE)
+  writtenSize = 0;
+  const uint8_t sizeofCrc = sizeof(uint32_t);
+  if(address + objectSize + sizeofCrc >= EEPROM_SIZE)
     return HAL_ERROR;
 
   //calc crc32
@@ -148,7 +150,8 @@ HAL_StatusTypeDef Eeprom::writeObjectWithCrc(uint16_t address, void* object, uin
   for(int i = 0; i < 10; ++i)
   {
     const HAL_StatusTypeDef result = write(address, (unsigned char*)object, objectSize);
-    const HAL_StatusTypeDef crcResult = write(address + objectSize, (unsigned char*)&crc32, sizeof(uint32_t));
+    const HAL_StatusTypeDef crcResult = write(address + objectSize, (unsigned char*)&crc32, sizeofCrc);
+    writtenSize = objectSize + sizeofCrc;
 
     if(result == HAL_BUSY || crcResult == HAL_BUSY)
     {
@@ -165,7 +168,9 @@ HAL_StatusTypeDef Eeprom::writeObjectWithCrc(uint16_t address, void* object, uin
       uint16_t readSize = 0;
       HAL_StatusTypeDef readResult = readObjectWithCrc(address, buffer, objectSize, readSize);
       if(readResult == HAL_OK)
+      {
         return HAL_OK;
+      }
     }
   }
 
@@ -175,11 +180,12 @@ HAL_StatusTypeDef Eeprom::writeObjectWithCrc(uint16_t address, void* object, uin
 HAL_StatusTypeDef Eeprom::readObjectWithCrc(uint16_t address, void* object, uint16_t objectSize, uint16_t& readSize)
 {
 
-  if(address + objectSize + sizeof(uint32_t) >= EEPROM_SIZE)
+  const uint8_t sizeofCrc = sizeof(uint32_t);
+  if(address + objectSize + sizeofCrc >= EEPROM_SIZE)
     return HAL_ERROR;
 
 
-  readSize = objectSize + sizeof(uint32_t);
+  readSize = objectSize + sizeofCrc;
 
   //try loading several times
   for(int i = 0; i < 10; ++i)
