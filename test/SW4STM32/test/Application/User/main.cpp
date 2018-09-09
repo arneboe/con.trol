@@ -41,7 +41,7 @@ void tcaselect(uint8_t i) {
 }
 
 
-void updateDisplayLoop(Adafruit_SSD1306& display);
+void mainDisplayLoop(Adafruit_SSD1306& display);
 void setupDisplayLoop(Adafruit_SSD1306& display);
 void resetDisplays(Adafruit_SSD1306& display);
 void displayHeader(Adafruit_SSD1306& display, uint8_t curentFaderValue, bool currentButtonValue,
@@ -307,14 +307,13 @@ int main(void)
     }
     else
     {
-      updateDisplayLoop(display);
+      mainDisplayLoop(display);
     }
   }
-
-
 }
 
 
+/** special display loop for setup */
 void setupDisplayLoop(Adafruit_SSD1306& display)
 {
   static uint8_t setupElement = 0;
@@ -359,8 +358,6 @@ void setupDisplayLoop(Adafruit_SSD1306& display)
     {
       printf("ERROR: Display %d failed\n", Elements::elements[setupElement].hwCfg.displayNum);
     }
-//    HAL_Delay(100);
-
   }
   else
   {
@@ -379,7 +376,8 @@ void setupDisplayLoop(Adafruit_SSD1306& display)
   }
 }
 
-void updateDisplayLoop(Adafruit_SSD1306& display)
+/** The main display loop. Draws fader values etc. */
+void mainDisplayLoop(Adafruit_SSD1306& display)
 {
   //the main just updates the displays.
   //everything else is done in interrupts
