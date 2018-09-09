@@ -16,9 +16,9 @@ int multiMap(uint16_t value)
   if(value > 4095) value = 4095;
 
 //  static uint16_t potiVals[] = {0, 44, 120, 222, 345, 470, 590, 895, 1715, 2465, 3220, 4050, 4094, 4095};
-  static float potiVals[] = {0, 12, 87, 130, 677, 4009, 4030, 4050};
+  static float potiVals[] = {0, 82,164, 573, 655, 737, 4014, 4095};
 //  static uint16_t midiVals[] = {0, 10, 21, 31, 42, 52, 63, 74, 84, 95, 105, 116, 127, 127};
-  static float midiVals[] = {0, 0, 26, 29, 70, 120, 121, 127};
+  static float midiVals[] = {0, 25, 38, 76, 81, 83, 121, 127};
 
   // search right interval
   uint8_t pos = 0;
