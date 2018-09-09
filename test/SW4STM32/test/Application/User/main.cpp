@@ -42,7 +42,7 @@ void tcaselect(uint8_t i) {
 
 
 void mainDisplayLoop(Adafruit_SSD1306& display);
-void setupDisplayLoop(Adafruit_SSD1306& display);
+void setupDisplayLoop(Adafruit_SSD1306& display, Eeprom& eeprom);
 void resetDisplays(Adafruit_SSD1306& display);
 void displayHeader(Adafruit_SSD1306& display, uint8_t curentFaderValue, bool currentButtonValue,
                    uint8_t midiChannel, bool isLinear);
@@ -303,7 +303,7 @@ int main(void)
 
     if(setupButtonPressed || setupRunning)
     {
-      setupDisplayLoop(display);
+      setupDisplayLoop(display, eeprom);
     }
     else
     {
@@ -314,18 +314,18 @@ int main(void)
 
 
 /** special display loop for setup */
-void setupDisplayLoop(Adafruit_SSD1306& display)
+void setupDisplayLoop(Adafruit_SSD1306& display, Eeprom& eeprom)
 {
   static uint8_t setupElement = 0;
   static uint32_t setupEnterTime = 0;
   static bool buttonPressed = false;
 
-  //buffers whether the fader is linear or not.
   if(setupRunning)
   {
     if(menu.done())
     {
       setupRunning = false;
+      Elements::storeElement(setupElement, eeprom);
       resetDisplays(display);
       return;
     }
@@ -334,6 +334,7 @@ void setupDisplayLoop(Adafruit_SSD1306& display)
     if((Buttons::pressed[SETUP_BUTTON_NUM] && HAL_GetTick() - setupEnterTime > 2000))
     {
       menu.abort();
+      Elements::storeElement(setupElement, eeprom);
       setupRunning = false;
       resetDisplays(display);
       return;

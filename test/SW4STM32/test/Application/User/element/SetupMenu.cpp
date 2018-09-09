@@ -92,7 +92,6 @@ SetupMenu::Menu* SetupMenu::TextMenu::getNextMenu()
   }
   else
   {
-    Elements::storeElementText(elemNum);
     return nullptr;
   }
 }
@@ -137,13 +136,10 @@ void SetupMenu::MainMenu::setElemNum(uint8_t num)
 
 void SetupMenu::TextMenu::abort()
 {
-  //store the current text
-  Elements::storeElementText(elemNum);
 }
 
 SetupMenu::Menu* SetupMenu::MidiMenu::getNextMenu()
 {
-  Elements::storeMidiChannel(elemNum);
   return nullptr;
 }
 
@@ -193,18 +189,15 @@ void SetupMenu::ModeMenu::show(Adafruit_SSD1306& display)
 
 SetupMenu::Menu* SetupMenu::ModeMenu::getNextMenu()
 {
-  Elements::storeMode(elemNum);
   return nullptr;
 }
 
 void SetupMenu::ModeMenu::abort()
 {
-  Elements::storeMode(elemNum);
 }
 
 void SetupMenu::MidiMenu::abort()
 {
-  Elements::storeMidiChannel(elemNum);
 }
 
 

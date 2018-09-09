@@ -6,6 +6,7 @@
 #include <cstring>
 
 Element Elements::elements[NUM_ELEMS];
+uint16_t Elements::userConfigEepromAddress[NUM_ELEMS];
 
 void Elements::init(Eeprom& eeprom)
 {
@@ -18,6 +19,7 @@ void Elements::init(Eeprom& eeprom)
     addr += readSize;
     eeprom.readObjectWithCrc(addr, &elements[i].userCfg,
         sizeof(ElementUserConfig), readSize);
+    userConfigEepromAddress[i] = addr;
     addr += readSize;
 
 //    printf("Element: %d\n", i);
@@ -34,6 +36,10 @@ void Elements::init()
 {
   for (int i = 0; i < NUM_ELEMS; ++i)
   {
+
+    //cannot store in eeprom if we never loaded from eeprom in the first place
+    userConfigEepromAddress[i] = 0;
+
     elements[i].hwCfg.buttonNum = i;
     elements[i].hwCfg.displayNum = i;
     elements[i].hwCfg.faderNum = i;
@@ -67,7 +73,7 @@ Element::Element() :
 void Elements::update()
 {
   Buttons::update();
-  //Faders update automatically
+  //Faders update automatically in the background using dma
 }
 
 uint8_t Element::getLinearMidiValue() const
@@ -118,39 +124,20 @@ uint8_t Element::getMidiValue() const
   return Faders::faders[hwCfg.faderNum].getMidiValue();
 }
 
-void Elements::storeElementText(uint8_t elemNum)
+void Elements::storeElement(uint8_t elemNum, Eeprom& eeprom)
 {
-//  uint16_t virtAddr = elemNum * NUM_CHARS;
-//  uint16_t remainingChars = NUM_CHARS;
-//  uint8_t currentChar = 0;
-//  while(remainingChars >= 2)
-//  {
-//    uint16_t data = elements[elemNum].text[currentChar];
-//    ++currentChar;
-//    data = (elements[elemNum].text[currentChar] << 8) | data;
-//    ++currentChar;
-//    EE_WriteVariable(virtAddr, data);
-//    ++virtAddr;
-//    remainingChars -= 2;
-//  }
-//  //num chars was odd,write last char
-//  if(remainingChars > 0)
-//  {
-//    uint16_t data = elements[elemNum].text[currentChar];
-//    EE_WriteVariable(virtAddr, data);
-//  }
+  if(elemNum >= NUM_ELEMS)
+  {
+    printf("illegal element number given: %d\n", elemNum);
+    return;
+  }
+
+  const uint16_t addr = userConfigEepromAddress[elemNum];
+  uint16_t bytesWritten = 0;
+  if(HAL_ERROR == eeprom.writeObjectWithCrc(addr, &elements[elemNum].userCfg, sizeof(ElementUserConfig), bytesWritten))
+  {
+    printf("Error while storing element user config: %d\n", elemNum);
+    return;
+  }
 }
 
-void Elements::storeMidiChannel(uint8_t elemNum)
-{
-//  const uint16_t virtAddr = NUM_ELEMS * NUM_CHARS + elemNum;
-//  const uint16_t data = elements[elemNum].midiChannel;
-//  EE_WriteVariable(virtAddr, data);
-}
-
-void Elements::storeMode(uint8_t elemNum)
-{
-//  const uint16_t virtAddr = NUM_ELEMS * NUM_CHARS + NUM_ELEMS + elemNum;
-//  const uint16_t data = Faders::faders[Elements::elements[elemNum].faderNum].isLinear;
-//  EE_WriteVariable(virtAddr, data);
-}

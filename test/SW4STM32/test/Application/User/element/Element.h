@@ -50,8 +50,13 @@ public:
 
 };
 
-struct Elements
+class Elements
 {
+private:
+  /**Start addresses of user configs in eeprom */
+  static uint16_t userConfigEepromAddress[NUM_ELEMS];
+
+public:
   static Element elements[NUM_ELEMS];
 
   //init from eeprom
@@ -61,9 +66,6 @@ struct Elements
 
   static void defaultInit();
   static void update();
-
-  static void loadElementConfig(uint8_t elemNum);
-  static void storeElementText(uint8_t elemNum);
-  static void storeMidiChannel(uint8_t elemNum);
-  static void storeMode(uint8_t elemNum);
+  /**Stores element config in eeprom */
+  static void storeElement(uint8_t elemNum, Eeprom& eeprom);
   };
