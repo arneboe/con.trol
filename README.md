@@ -1,8 +1,19 @@
 # con.trol
-A STM32F103 usb midi controller.
+A STM32F103 usb midi controller with displays for each fader.
 
-Due to strange stm32 hal generated project structure the real code is here:
+
+![Alt text](pic.jpg?raw=true "Controller")
+
+
+## Code Location
 https://github.com/arneboe/con.trol/tree/master/test/SW4STM32/test/Application/User
 
-Analog reading taken from: https://github.com/dxinteractive/ResponsiveAnalogRead
+The project structure was generated using CubeMX, thus the strange folder structure.
+
+
+
+
+## Credits
+Fader smoothing: https://github.com/dxinteractive/ResponsiveAnalogRead
+
 
