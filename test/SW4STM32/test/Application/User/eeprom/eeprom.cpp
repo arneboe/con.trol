@@ -1,5 +1,7 @@
 #include "eeprom.h"
 #include "Hardware.h"
+#include "element/Element.h"
+#include <cstring>
 
 Eeprom::Eeprom(I2C_HandleTypeDef* i2cPort)
 {
@@ -211,6 +213,218 @@ HAL_StatusTypeDef Eeprom::readObjectWithCrc(uint16_t address, void* object, uint
     }
   }
   return HAL_ERROR;
+}
+
+void Eeprom::burnConfig()
+{
+  ElementHardwareConfig hw;
+  ElementUserConfig user;
+
+  uint16_t addr = 0;
+  uint16_t writeSize = 0;
+
+  hw.faderNum = 7;
+  hw.buttonNum = 8;
+  hw.displayNum = 0;
+  user.midiChannel = 0;
+  user.faderLinear = false;
+  strcpy(user.text, "Unused");
+  if(HAL_ERROR == this->writeObjectWithCrc(addr, &hw, sizeof(ElementHardwareConfig), writeSize))
+  {
+    printf("config write error!!!\n");
+    return;
+  }
+  addr += writeSize;
+
+  if(HAL_ERROR == this->writeObjectWithCrc(addr, &user, sizeof(ElementUserConfig), writeSize))
+  {
+    printf("config write error!!!\n");
+    return;
+  }
+  addr += writeSize;
+
+
+//  printf("reading bytes: \n");
+//  for(int i = 0; i < addr; ++i)
+//  {
+//    uint8_t data = 42;
+//    if(HAL_OK != eeprom.readByte(i,data))
+//    {
+//      printf("READ ERROR\n");
+//      return;
+//    }
+//    printf("%d ", data);
+//  }
+//  printf("\n");
+
+
+
+
+  hw.faderNum = 6;
+  hw.buttonNum = 7;
+  hw.displayNum = 1;
+  ++user.midiChannel;
+  if(HAL_ERROR == this->writeObjectWithCrc(addr, &hw, sizeof(ElementHardwareConfig), writeSize))
+  {
+    printf("config write error!!!\n");
+    return;
+  }
+  addr += writeSize;
+
+  if(HAL_ERROR == this->writeObjectWithCrc(addr, &user, sizeof(ElementUserConfig), writeSize))
+  {
+    printf("config write error!!!\n");
+    return;
+  }
+  addr += writeSize;
+
+  hw.faderNum = 5;
+  hw.buttonNum = 6;
+  hw.displayNum = 2;
+  ++user.midiChannel;
+  if(HAL_ERROR == this->writeObjectWithCrc(addr, &hw, sizeof(ElementHardwareConfig), writeSize))
+  {
+    printf("config write error!!!\n");
+    return;
+  }
+  addr += writeSize;
+
+  if(HAL_ERROR == this->writeObjectWithCrc(addr, &user, sizeof(ElementUserConfig), writeSize))
+  {
+    printf("config write error!!!\n");
+    return;
+  }
+  addr += writeSize;
+
+  hw.faderNum = 4;
+  hw.buttonNum = 5;
+  hw.displayNum = 3;
+  ++user.midiChannel;
+  if(HAL_ERROR == this->writeObjectWithCrc(addr, &hw, sizeof(ElementHardwareConfig), writeSize))
+  {
+    printf("config write error!!!\n");
+    return;
+  }
+  addr += writeSize;
+
+  if(HAL_ERROR == this->writeObjectWithCrc(addr, &user, sizeof(ElementUserConfig), writeSize))
+  {
+    printf("config write error!!!\n");
+    return;
+  }
+  addr += writeSize;
+
+  hw.faderNum = 0;
+  hw.buttonNum = 4;
+  hw.displayNum = 4;
+  ++user.midiChannel;
+  if(HAL_ERROR == this->writeObjectWithCrc(addr, &hw, sizeof(ElementHardwareConfig), writeSize))
+  {
+    printf("config write error!!!\n");
+    return;
+  }
+  addr += writeSize;
+
+  if(HAL_ERROR == this->writeObjectWithCrc(addr, &user, sizeof(ElementUserConfig), writeSize))
+  {
+    printf("config write error!!!\n");
+    return;
+  }
+  addr += writeSize;
+
+  hw.faderNum = 1;
+  hw.buttonNum = 3;
+  hw.displayNum = 5;
+  ++user.midiChannel;
+  if(HAL_ERROR == this->writeObjectWithCrc(addr, &hw, sizeof(ElementHardwareConfig), writeSize))
+  {
+    printf("config write error!!!\n");
+    return;
+  }
+  addr += writeSize;
+
+  if(HAL_ERROR == this->writeObjectWithCrc(addr, &user, sizeof(ElementUserConfig), writeSize))
+  {
+    printf("config write error!!!\n");
+    return;
+  }
+  addr += writeSize;
+
+  hw.faderNum = 2;
+  hw.buttonNum = 2;
+  hw.displayNum = 6;
+  ++user.midiChannel;
+  if(HAL_ERROR == this->writeObjectWithCrc(addr, &hw, sizeof(ElementHardwareConfig), writeSize))
+  {
+    printf("config write error!!!\n");
+    return;
+  }
+  addr += writeSize;
+
+  if(HAL_ERROR == this->writeObjectWithCrc(addr, &user, sizeof(ElementUserConfig), writeSize))
+  {
+    printf("config write error!!!\n");
+    return;
+  }
+  addr += writeSize;
+
+
+  hw.faderNum = 3;
+  hw.buttonNum = 1;
+  hw.displayNum = 7;
+  ++user.midiChannel;
+  if(HAL_ERROR == this->writeObjectWithCrc(addr, &hw, sizeof(ElementHardwareConfig), writeSize))
+  {
+    printf("config write error!!!\n");
+    return;
+  }
+  addr += writeSize;
+
+  if(HAL_ERROR == this->writeObjectWithCrc(addr, &user, sizeof(ElementUserConfig), writeSize))
+  {
+    printf("config write error!!!\n");
+    return;
+  }
+  addr += writeSize;
+
+
+
+  //read and print config for human validation
+  ElementHardwareConfig hwRead;
+  ElementUserConfig userRead;
+  uint16_t readAddr = 0;
+  uint16_t readSize = 0;
+
+
+  for(int i = 0; i < 8; ++i)
+  {
+    if(HAL_OK == this->readObjectWithCrc(readAddr, &hwRead, sizeof(ElementHardwareConfig), readSize))
+    {
+      readAddr += readSize;
+      printf("Reading Element %d\n",i);
+      DUMP_VAR(hwRead.buttonNum);
+      DUMP_VAR(hwRead.displayNum);
+      DUMP_VAR(hwRead.faderNum);
+      if(HAL_OK == this->readObjectWithCrc(readAddr, &userRead, sizeof(ElementUserConfig), readSize))
+      {
+        readAddr += readSize;
+        DUMP_VAR(userRead.faderLinear);
+        DUMP_VAR(userRead.midiChannel);
+        printf("Text: %s\n", userRead.text);
+      }
+      else
+      {
+        printf("READ ERROR!!\n");
+        return;
+      }
+    }
+    else
+    {
+      printf("READ ERROR ELEMENT %d\n", i);
+      return;
+    }
+    printf("-----------------------\n");
+  }
 }
 
 

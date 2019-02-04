@@ -41,6 +41,9 @@ public:
    * @param readSize Number of bytes read (including the crc)  */
   HAL_StatusTypeDef readObjectWithCrc(uint16_t address, void* object, uint16_t objectSize, uint16_t& readSize);
 
+  /** Burn the initial config. Should not be called during normal operation :-)
+   *  FIXME This is a dirty hack to initially populate the eeprom */
+  void burnConfig();
 
 
 private:
