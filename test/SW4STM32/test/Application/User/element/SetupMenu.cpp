@@ -27,7 +27,7 @@ void SetupMenu::reset(uint8_t elemNum)
 SetupMenu::Menu* SetupMenu::MainMenu::getNextMenu()
 {
 
-  const uint8_t faderValue = Elements::elements[elemNum].getLogMidiValue();
+  const uint8_t faderValue = Elements::elements[elemNum].getLinearMidiValue();
   uint8_t selection = map(faderValue, 0, 127, 0, 2);
   if(selection == 0)
   {
@@ -54,7 +54,7 @@ void SetupMenu::MainMenu::show(Adafruit_SSD1306& display)
   display.setTextSize(2);
   display.setCursor(0, 0);
 
-  const uint8_t faderValue = Elements::elements[elemNum].getLogMidiValue();
+  const uint8_t faderValue = Elements::elements[elemNum].getLinearMidiValue();
   uint8_t selection = map(faderValue, 0, 127, 0, 2);
   display.println("Configure");
 //  display.println(selection);
@@ -105,7 +105,7 @@ void SetupMenu::TextMenu::show(Adafruit_SSD1306& display)
   display.println("SET TEXT");
 
   const uint8_t numChars = strlen(abc);
-  const uint8_t faderValue = Elements::elements[elemNum].getLogMidiValue();
+  const uint8_t faderValue = Elements::elements[elemNum].getLinearMidiValue();
   uint8_t selection = map(faderValue, 0, 127, 0, numChars - 1);
   display.setCursor(0, MENU_START);
   currentChar = abc[selection];
@@ -152,7 +152,7 @@ void SetupMenu::MidiMenu::show(Adafruit_SSD1306& display)
   display.println("SET MIDI");
 
   //FIXME why midi 119? There was some reason?!
-  const uint8_t faderValue = Elements::elements[elemNum].getLogMidiValue();
+  const uint8_t faderValue = Elements::elements[elemNum].getLinearMidiValue();
   uint8_t midiChannel = map(faderValue, 0, 127, 0, 119);
   Elements::elements[elemNum].userCfg.midiChannel = midiChannel;
   display.setCursor(0, MENU_START);
@@ -168,7 +168,7 @@ void SetupMenu::ModeMenu::show(Adafruit_SSD1306& display)
   display.setTextColor(WHITE);
   display.setTextSize(2);
   display.setCursor(0, 0);
-  const uint8_t faderValue = Elements::elements[elemNum].getLogMidiValue();
+  const uint8_t faderValue = Elements::elements[elemNum].getLinearMidiValue();
   uint8_t selection = map(faderValue, 0, 127, 0, 1);
   Faders::faders[Elements::elements[elemNum].hwCfg.faderNum].isLinear = (bool) selection;
   display.println("SET MODE");
